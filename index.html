@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="triform_favicon.png" />
+    <link rel="icon" href="./images/icon.ico" />
     <link rel="stylesheet" href="style.css" />
     <title>Triform</title>
   </head>
   <body>
     <header>
-      <img src="images/triform_darkmode_logo.png" alt="Logo Triform" />
+      <img src="./images/logo_darkmode.png" alt="Logo Triform" />
       <nav>
         <ul>
           <li>
@@ -27,19 +27,18 @@
     <main>
       <section id="generate">
         <h1>Transforme suas imagens em modelos 3D em poucos segundos</h1>
-        <div class="upload-card">
-          <div class="upload-area-outer">
-            <div class="upload-area-inner">
-              <img src="images/image_add_icon.png" alt="Ícone de upload" />
-              <p>
-                Clique aqui para <br />
-                selecionar as imagens<br />ou solte elas aqui <br />
-                (até 10 imagens)
-              </p>
-            </div>
+          <div class="upload-card">
+            <label for="file" class="file-input">
+              <input type="file" id="file" multiple="multiple">
+              <div class="drop-zone" id="drop-zone">
+                <div class="placeholder">
+                  <img src="./images/add_photo.png" alt="">
+                  <p>Selecione até 10 imagens ou solte elas aqui</p>
+                </div>
+              </div>
+            </label>
           </div>
-          <a href="#" class="btn-primary">Gerar</a>
-        </div>
+          <input class="button-gerar" type="button" value="GERAR">
       </section>
     </main>
     <footer>
@@ -50,5 +49,6 @@
         Universidade Presbiteriana Mackenzie.
       </p>
     </footer>
+    <script src="./script.js"></script>
   </body>
 </html>
