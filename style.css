@@ -11,12 +11,12 @@
   --header-footer-color: #454545;
   --text-color: #ffffff;
   --link-hover-color: #ef622f;
-  --upload-aviso-color: #ff0000;
+  --upload-aviso-color: #ff3434;
   --upload-card-bg: #3c3c3c;
   --upload-drop-border: #d7d7d7;
   --upload-drop-hover-bg: #d6d6d640;
   --upload-text-shadow: #12121280;
-  --generate-button-color: #34CB79;
+  --generate-button-color: #34cb79;
   --generate-button-hover-color: #34ae68;
 }
 
@@ -53,7 +53,7 @@ header img {
 
 p {
   color: var(--text-color);
-  font-size: 14px;
+  font-size: 16px;
   font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
   font-weight: Regular;
 }
@@ -170,6 +170,7 @@ main h1 {
 #generate .upload-card .file-input:hover {
   opacity: 0.5;
   transition-duration: 250ms;
+  cursor: pointer;
 }
 
 #generate .upload-card .remove-btn {
@@ -180,22 +181,23 @@ main h1 {
 }
 
 /* ===== Botão Gerar ===== */
-#generate .button-gerar{
+#generate .button-gerar {
   border: none;
   color: var(--text-color);
   background-color: var(--generate-button-color);
-  padding: 15px 32px;
+  padding: 18px 36px;
   text-align: center;
   text-decoration: none;
   display: block;
   font-size: 16px;
-  cursor: pointer;
+  font-weight: bold;
   margin: 0 auto;
   border-radius: 15px;
 }
 
 #generate .button-gerar:hover {
   background-color: var(--generate-button-hover-color);
+  cursor: pointer;
 }
 
 /* ===== Rodapé ===== */
