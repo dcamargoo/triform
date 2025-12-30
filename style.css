@@ -11,12 +11,13 @@
   --header-footer-color: #454545;
   --text-color: #ffffff;
   --link-hover-color: #ef622f;
-  --upload-area-outer-color: #868686;
-  --upload-area-inner-color: #5e5e5e;
-  --upload-area-inner-hover-color: #6b6b6b;
-  --upload-area-border-color: #ffffff;
-  --generate-button-color: #58f36f;
-  --generate-button-hover-color: #34c54f;
+  --upload-aviso-color: #ff0000;
+  --upload-card-bg: #3c3c3c;
+  --upload-drop-border: #d7d7d7;
+  --upload-drop-hover-bg: #d6d6d640;
+  --upload-text-shadow: #12121280;
+  --generate-button-color: #34CB79;
+  --generate-button-hover-color: #34ae68;
 }
 
 /*estilos globais*/
@@ -27,7 +28,6 @@ body {
 }
 
 /*início da estilização*/
-
 body {
   min-height: 100vh; /*garante que o corpo ocupe toda a altura da viewport*/
   display: flex;
@@ -35,6 +35,7 @@ body {
   background-color: var(--main-background-color);
 }
 
+/* ===== Cabeçalho ===== */
 header {
   background-color: var(--header-footer-color);
   display: flex;
@@ -52,7 +53,7 @@ header img {
 
 p {
   color: var(--text-color);
-  font-size: 18px;
+  font-size: 14px;
   font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
   font-weight: Regular;
 }
@@ -77,15 +78,15 @@ a {
   text-decoration: none;
 }
 
+/* ===== Conteúdo Principal ===== */
 main {
-  background-color: #2b2b2b;
   display: flex;
   flex-direction: column;
   margin: 32px;
   flex: 1;
 }
 
-h1 {
+main h1 {
   color: var(--text-color);
   font-size: 32px;
   font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
@@ -93,68 +94,111 @@ h1 {
   text-align: center;
 }
 
-.upload-card {
+/* ===== Área de Upload ===== */
+#generate .upload-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  margin-top: 48px;
+  margin: 60px 0 30px;
 }
 
-.upload-area-outer {
-  width: 600px;
-  height: 300px;
-  background-color: var(--upload-area-outer-color);
-  border-radius: 15px;
-  border: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.upload-area-inner {
-  width: 550px;
-  height: 260px;
-  background-color: var(--upload-area-inner-color);
-  border-radius: 15px;
-  border: 3px dashed var(--upload-area-border-color);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.upload-area-inner img {
-  width: 50px;
-  height: 50px;
-}
-
-.upload-area-inner p {
-  font-size: 16px;
-  font-weight: 400;
-}
-
-.upload-area-inner:hover {
-  background-color: var(--upload-area-inner-hover-color);
-  cursor: pointer;
-}
-
-.btn-primary {
-  background-color: var(--generate-button-color);
-  font-size: 18px;
+#generate .upload-card span {
+  color: var(--upload-aviso-color);
   font-weight: bold;
+  margin-left: -350px;
+}
+
+#generate .upload-card .file-input {
+  width: 700px;
+  height: 350px;
+  background-color: var(--upload-card-bg);
+  display: grid;
+  grid-template-areas: "stack";
+  border-radius: 15px;
+}
+
+#generate .upload-card .file-input > * {
+  grid-area: stack;
+}
+
+#generate .upload-card .file-input > input {
+  opacity: 0;
+}
+
+#generate .upload-card .file-input > .drop-zone {
+  margin: 15px;
+  border: dashed 2px var(--upload-drop-border);
+  border-radius: 4px;
+}
+
+#generate .upload-card .file-input.active > .drop-zone {
+  margin: 14px;
+  background-color: var(--upload-drop-hover-bg);
+}
+
+#generate .upload-card .drop-zone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: background 200ms;
+  position: relative;
+}
+
+#generate .upload-card .drop-zone img {
+  width: 32px;
+  height: 32px;
+}
+
+#generate .upload-card .drop-zone p {
+  text-shadow: var(--upload-text-shadow) 1px 0 20px;
+  width: 175px;
+}
+
+#generate .upload-card .drop-zone #cover {
+  width: 100px;
+  height: 100px;
+  z-index: 0;
+  opacity: 0.8;
+  transition: opacity 500ms;
+  object-fit: cover;
+}
+
+#generate .upload-card .file-input:hover {
+  opacity: 0.5;
+  transition-duration: 250ms;
+}
+
+#generate .upload-card .remove-btn {
+  width: 32px;
+  position: absolute;
+  margin-left: -16px;
+  margin-top: -16px;
+}
+
+/* ===== Botão Gerar ===== */
+#generate .button-gerar{
+  border: none;
+  color: var(--text-color);
+  background-color: var(--generate-button-color);
+  padding: 15px 32px;
+  text-align: center;
   text-decoration: none;
-  border-radius: 10px;
-  padding: 18px 36px;
-}
-
-.btn-primary:hover {
-  background-color: var(--generate-button-hover-color);
+  display: block;
+  font-size: 16px;
   cursor: pointer;
+  margin: 0 auto;
+  border-radius: 15px;
 }
 
+#generate .button-gerar:hover {
+  background-color: var(--generate-button-hover-color);
+}
+
+/* ===== Rodapé ===== */
 footer {
   background-color: var(--header-footer-color);
   text-align: center;
