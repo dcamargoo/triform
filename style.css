@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-/*Variáveis de cores*/
+/*variáveis de cores*/
 :root {
   --main-background-color: #2b2b2b;
   --header-footer-color: #454545;
@@ -19,17 +19,17 @@
   --generate-button-hover-color: #34c54f;
 }
 
-/*Estilos globais*/
+/*estilos globais*/
 html,
 body {
   background-color: var(--main-background-color);
   height: 100%;
 }
 
-/*Início da Estilização*/
+/*início da estilização*/
 
 body {
-  min-height: 100vh; /*Garante que o corpo ocupe toda a altura da viewport*/
+  min-height: 100vh; /*garante que o corpo ocupe toda a altura da viewport*/
   display: flex;
   flex-direction: column;
   background-color: var(--main-background-color);
