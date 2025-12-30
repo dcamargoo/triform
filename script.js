@@ -64,7 +64,7 @@ input.addEventListener("change", () => {
     img.src = URL.createObjectURL(file);
 
     const remove = document.createElement("img");
-    remove.src = "./images/delete.png";
+    remove.src = "./images/icon_delete.png";
     remove.classList.add("remove-btn");
 
     remove.onclick = function (e) {
