@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="favicon.ico" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <title>Triform</title>
   </head>
   <body>
     <header>
-      <img src="./images/logo_darkmode.png" alt="Logo Triform" />
+      <img src="{{ url_for('static', filename='images/logo_darkmode.png') }}" alt="Logo Triform" />
       <nav>
         <ul>
           <li>
@@ -27,18 +27,18 @@
     <main>
       <section id="generate">
         <h1>Transforme suas imagens em modelos 3D em poucos segundos</h1>
-        <div class="upload-card">
-          <label for="file" class="file-input">
-            <input type="file" id="file" multiple="multiple" />
-            <div class="drop-zone" id="drop-zone">
-              <div class="placeholder">
-                <img src="./images/icon_add_photo.png" alt="" />
-                <p>Selecione até 10 imagens ou solte elas aqui</p>
+          <div class="upload-card">
+            <label for="file" class="file-input">
+              <input type="file" id="file" multiple="multiple">
+              <div class="drop-zone" id="drop-zone">
+                <div class="placeholder">
+                  <img src="{{ url_for('static', filename='images/icon_add_photo.png') }}" alt="">
+                  <p>Selecione até 10 imagens ou solte elas aqui</p>
+                </div>
               </div>
-            </div>
-          </label>
-        </div>
-        <input class="button-gerar" type="button" value="GERAR" />
+            </label>
+          </div>
+          <input class="button-gerar" type="button" value="GERAR">
       </section>
     </main>
     <footer>
@@ -49,6 +49,6 @@
         Universidade Presbiteriana Mackenzie.
       </p>
     </footer>
-    <script src="./script.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </body>
 </html>

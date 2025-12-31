@@ -64,7 +64,7 @@ input.addEventListener("change", () => {
     img.src = URL.createObjectURL(file);
 
     const remove = document.createElement("img");
-    remove.src = "./images/icon_delete.png";
+    remove.src = "./static/images/icon_delete.png";
     remove.classList.add("remove-btn");
 
     remove.onclick = function (e) {
@@ -80,7 +80,7 @@ input.addEventListener("change", () => {
         placeholder.classList.add("placeholder");
 
         const icon = document.createElement("img");
-        icon.src = "./images/add_photo.png";
+        icon.src = "./static/images/icon_add_photo.png";
 
         const text = document.createElement("p");
         text.textContent = "Selecione até 10 imagens ou solte elas aqui";
