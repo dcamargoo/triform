@@ -29,4 +29,4 @@ def run_sfm():
 
     maps[0].write(sparse_dir)
 
-run_sfm()
+# run_sfm() apenas para testar
