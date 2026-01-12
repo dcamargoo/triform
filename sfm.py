@@ -1,32 +1,32 @@
+# importando o pycolmap e outras bibliotecas necessárias
 import pycolmap
+from pathlib import Path
 
-# função que executa o Structure from Motion (SfM)
-def run_sfm(arg_image_dir, arg_output_dir, arg_database_path):
-    
+# função principal para executar o SfM (chamada no arquivo Flask)
+def run_sfm():
+
+    image_dir = Path("colmap/images")
+    sparse_dir = Path("colmap/sparse")
+
+    if not image_dir.exists():
+        raise RuntimeError("Pasta 'images' não encontrada")
+
+    database = sparse_dir / "database.db"
+
     # detecção e descrição de features com SIFT
-    pycolmap.extract_features(
-        database_path=arg_database_path,
-        image_path=arg_image_dir
-    )
+    pycolmap.extract_features(database, image_dir)
 
-    # correspondência (Matching) exaustiva de features
-    pycolmap.match_exhaustive(database_path=arg_database_path)
-
-    # RANSAC para verificar os matches encontrados
-    pycolmap.verify_matches(database_path=arg_database_path)
+    # correspondência (Matching) exaustiva/não sequencial de features 
+    pycolmap.match_exhaustive(database)
 
     # SfM incremental (poses + triangulação + refinamentos + BA internos)
-    reconstruction = pycolmap.incremental_mapping(
-        database_path=arg_database_path,
-        image_path=arg_image_dir,
-        output_path=arg_output_dir,
-    )
+    maps = pycolmap.incremental_mapping(database, image_dir, sparse_dir)
 
-    # pegando a maior reconstrução
-    bestReconstruction = max(reconstruction, key=lambda r: len(r.images))
-    
-    return bestReconstruction
+    if len(maps) == 0:
+        raise RuntimeError("Nenhuma reconstrução válida foi criada!")
+    else:   
+        print("Reconstruções válidas:", len(maps))
 
-    # testando o resultado da função
-    print("Quantidade de imagens registradas:", len(bestReconstruction.images))
-    print("Pontos 3D:", len(bestReconstruction.points3D))
+    maps[0].write(sparse_dir)
+
+run_sfm()
