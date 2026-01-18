@@ -96,6 +96,4 @@ input.addEventListener("change", () => {
     wrapper.appendChild(remove);
     dropzone.appendChild(wrapper);
   });
-
-  input.value = "";
 });
