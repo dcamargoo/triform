@@ -1,0 +1,33 @@
+# importando o pycolmap e outras bibliotecas necessárias
+import pycolmap
+from pathlib import Path
+
+# função principal para executar o MVS (chamada no arquivo Flask)
+def run_mvs():
+    IMAGE_DIR = Path("colmap/images")
+    SPARSE_DIR = Path("colmap/sparse/0")
+    DENSE_DIR = Path("colmap/dense")
+
+    if not SPARSE_DIR.exists():
+        raise RuntimeError("Modelo SfM não encontrado em 'colmap/sparse/0'")
+
+    # cria a pasta dense caso não exista
+    DENSE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # correção de distorção das imagens usando o modelo SfM
+    pycolmap.undistort_images(
+        output_path=DENSE_DIR,
+        image_path=IMAGE_DIR,
+        input_path=SPARSE_DIR
+    )
+
+    # estimativa de mapas de profundidade (PatchMatch Stereo)
+    pycolmap.patch_match_stereo(DENSE_DIR)
+
+    # fusão dos mapas de profundidade em uma nuvem de pontos densa
+    pycolmap.stereo_fusion(
+        output_path=DENSE_DIR / "fused.ply",
+        workspace_path=DENSE_DIR
+    )
+
+    print("MVS finalizado com sucesso")

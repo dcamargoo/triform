@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect
+from reconstruction import sfm, mvs
 
 app = Flask(__name__)
 
@@ -13,6 +14,9 @@ def upload():
     for file in files:
         if file.filename:
             file.save(f'colmap/images/{file.filename}')
+
+    sfm.run_sfm()
+    mvs.run_mvs()
 
     return redirect('/')
 
