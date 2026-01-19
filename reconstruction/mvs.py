@@ -4,9 +4,9 @@ from pathlib import Path
 
 # função principal para executar o MVS (chamada no arquivo Flask)
 def run_mvs():
-    IMAGE_DIR = Path("colmap/images")
-    SPARSE_DIR = Path("colmap/sparse/0")
-    DENSE_DIR = Path("colmap/dense")
+    IMAGE_DIR = Path("../colmap/images")
+    SPARSE_DIR = Path("../colmap/sparse/0")
+    DENSE_DIR = Path("../colmap/dense")
 
     if not SPARSE_DIR.exists():
         raise RuntimeError("Modelo SfM não encontrado em 'colmap/sparse/0'")
@@ -31,3 +31,5 @@ def run_mvs():
     )
 
     print("MVS finalizado com sucesso")
+
+# run_mvs() teste local

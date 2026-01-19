@@ -4,9 +4,9 @@ from pathlib import Path
 
 # função principal para executar o SfM (chamada no arquivo Flask)
 def run_sfm():
-    IMAGE_DIR = Path("colmap/images")
-    SPARSE_DIR = Path("colmap/sparse")
-    DATASET_PATH = Path("colmap")
+    IMAGE_DIR = Path("../colmap/images")
+    SPARSE_DIR = Path("../colmap/sparse")
+    DATASET_PATH = Path("../colmap")
 
     if not IMAGE_DIR.exists():
         raise RuntimeError("Pasta 'images' não encontrada")
@@ -28,3 +28,5 @@ def run_sfm():
         print("Reconstruções válidas:", len(maps))
 
     maps[0].write(SPARSE_DIR)
+
+# run_sfm() teste local
