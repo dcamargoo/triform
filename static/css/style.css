@@ -15,9 +15,12 @@
   --upload-card-bg: #3c3c3c;
   --upload-drop-border: #d7d7d7;
   --upload-drop-hover-bg: #d6d6d640;
+  --model-result-bg: #3c3c3c;
   --upload-text-shadow: #12121280;
   --generate-button-color: #34cb79;
   --generate-button-hover-color: #34ae68;
+  --success-color: #24ff53;
+  --fail-color: #ff3434;
 }
 
 /*estilos globais*/
@@ -198,6 +201,47 @@ main h1 {
 #generate .button-gerar:hover {
   background-color: var(--generate-button-hover-color);
   cursor: pointer;
+}
+
+/* ===== Canva 3D ===== */
+#viewer-section {
+  width: 100%;
+  margin-top: 64px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#viewer-section h2,
+#viewer-section #viewer-status {
+  width: 100%;
+  text-align: center;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  color: var(--text-color);
+  font-weight: bold;
+}
+
+#viewer-section #viewer-status {
+  color: var(--success-color);
+}
+
+.viewer-container {
+  width: min(600px, 100%);
+  height: 350px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#viewer-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  background-color: var(--model-result-bg);
+  display: block;
 }
 
 /* ===== Rodapé ===== */
