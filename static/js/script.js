@@ -1,6 +1,6 @@
+/* ===== OPEN 3D ===== */
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-// Three.js (cubo para teste)
 function initViewer() {
   const canvas = document.getElementById("viewer-canvas");
   if (!canvas) return;
@@ -23,7 +23,7 @@ function initViewer() {
 
   const cube = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshNormalMaterial(),
+    new THREE.MeshNormalMaterial()
   );
   scene.add(cube);
 
@@ -49,98 +49,171 @@ function initViewer() {
   animate();
 }
 
-// Roda o viewer assim que a página carrega (UMA vez)
-window.addEventListener("DOMContentLoaded", initViewer);
+window.addEventListener("DOMContentLoaded", () => {
+  initViewer();
+  updateButtonState();
+});
 
-// Upload de imagens com drag and drop
-const label = document.querySelector("label");
-const input = document.querySelector("input");
+/* ===== UPLOAD ===== */
 const dropzone = document.querySelector("#drop-zone");
-const fileinput = document.querySelector(".upload-card");
+const label = document.querySelector("label.file-input");
+const input = document.querySelector("input[type='file']");
+const addedImages = new Set();
+const maxImages = 10;
 
-const msg = document.createElement("span");
-fileinput.appendChild(msg);
+function updateButtonState() {
+  const boxZone = document.querySelector(".box-zone");
+  const button = document.querySelector(".button-gerar");
+  if (!button) return;
 
-const selectedFIles = new Set();
+  const hasImages = boxZone && boxZone.querySelectorAll("img").length > 0;
 
-function onEnter() {
-  label.classList.add("active");
+  if (hasImages) {
+    button.classList.add("button-enabled");
+    button.classList.remove("button-disabled");
+    button.disabled = false;
+  } else {
+    button.classList.add("button-disabled");
+    button.classList.remove("button-enabled");
+    button.disabled = true;
+  }
 }
-function onLeave() {
-  label.classList.remove("active");
-}
+
+function onEnter() { label.classList.add("active"); }
+function onLeave() { label.classList.remove("active"); }
 
 label.addEventListener("dragenter", onEnter);
-label.addEventListener("drop", onLeave);
-label.addEventListener("dragend", onLeave);
 label.addEventListener("dragleave", onLeave);
+label.addEventListener("dragend", onLeave);
 label.addEventListener("dragover", (e) => {
   e.preventDefault();
   label.classList.add("active");
 });
-
 label.addEventListener("drop", (e) => {
   e.preventDefault();
-  const files = e.dataTransfer.files;
-  input.files = files;
+  onLeave();
+  const files = Array.from(e.dataTransfer.files);
+  input.files = e.dataTransfer.files;
   input.dispatchEvent(new Event("change"));
 });
 
+dropzone.addEventListener("click", () => {
+  if (!document.querySelector(".box-zone")) {
+    const boxZone = document.createElement("div");
+    boxZone.classList.add("box-zone");
+
+    boxZone.style.marginTop = "10px";
+    boxZone.style.display = "flex";
+    boxZone.style.flexWrap = "wrap";
+    boxZone.style.justifyContent = "center";
+    boxZone.style.gap = "20px";
+    boxZone.style.gridArea = "auto";
+
+    dropzone.insertAdjacentElement("afterend", boxZone);
+  }
+});
+
 input.addEventListener("change", () => {
-  msg.textContent = "";
+  const files = Array.from(input.files);
+  const boxZone = document.querySelector(".box-zone");
+  if (!boxZone) return;
 
-  const formats = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-  const files = Array.from(input.files).slice(0, 10);
+  const currentImages = boxZone.querySelectorAll("img").length;
+  const spacesLeft = maxImages - currentImages;
+  if (spacesLeft <= 0) return;
 
-  const placeholder = dropzone.querySelector(".placeholder");
-  if (placeholder) placeholder.remove();
+  const validFormats = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
 
-  files.forEach((file) => {
-    if (!formats.includes(file.type)) return;
+  files.slice(0, spacesLeft).forEach(file => {
+    const fileID = `${file.name}-${file.size}`;
 
-    if (selectedFIles.has(file.name)) {
-      msg.textContent = "* Essa imagem já foi selecionada anteriormente.";
+    if (addedImages.has(fileID)) {
+      showMessage("* Essa imagem já foi selecionada anteriormente.");
       return;
     }
 
-    selectedFIles.add(file.name);
+    if (!validFormats.includes(file.type)) return;
+
+    addedImages.add(fileID);
 
     const wrapper = document.createElement("div");
-    wrapper.classList.add("cover-wrapper");
+    wrapper.style.position = "relative";
+    wrapper.style.width = "128px";
+    wrapper.style.height = "128px";
+    wrapper.style.display = "flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.justifyContent = "center";
 
     const img = document.createElement("img");
-    img.id = "cover";
     img.src = URL.createObjectURL(file);
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "15px";
 
-    const remove = document.createElement("img");
-    remove.src = "./static/images/icon_delete.png";
-    remove.classList.add("remove-btn");
+    const removeBtn = document.createElement("button");
+    removeBtn.innerText = "X";
+    removeBtn.style.position = "absolute";
+    removeBtn.style.top = "5px";
+    removeBtn.style.right = "5px";
+    removeBtn.style.width = "25px";
+    removeBtn.style.height = "25px";
+    removeBtn.style.borderRadius = "15px";
+    removeBtn.style.background = "#2B2B2B";
+    removeBtn.style.color = "#D7D7D7";
+    removeBtn.style.cursor = "pointer";
 
-    remove.onclick = function (e) {
+    removeBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      e.stopPropagation();
-
-      selectedFIles.delete(file.name);
       wrapper.remove();
-
-      if (dropzone.querySelectorAll(".cover-wrapper").length === 0) {
-        const placeholder = document.createElement("div");
-        placeholder.classList.add("placeholder");
-
-        const icon = document.createElement("img");
-        icon.src = "./static/images/icon_add_photo.png";
-
-        const text = document.createElement("p");
-        text.textContent = "Selecione até 10 imagens ou solte elas aqui";
-
-        placeholder.appendChild(icon);
-        placeholder.appendChild(text);
-        dropzone.appendChild(placeholder);
-      }
-    };
+      addedImages.delete(fileID);
+      updateButtonState();
+    });
 
     wrapper.appendChild(img);
-    wrapper.appendChild(remove);
-    dropzone.appendChild(wrapper);
+    wrapper.appendChild(removeBtn);
+    boxZone.appendChild(wrapper);
   });
+
+  input.value = ""; 
+  updateButtonState();
+});
+
+function showMessage(text) {
+  let msg = document.querySelector(".msg-erro");
+  const form = document.querySelector("#generate form .file-input");
+  if (!form) return;
+
+  if (!msg) {
+    msg = document.createElement("p");
+    msg.classList.add("msg-erro");
+    msg.style.color = "red";
+    msg.style.marginLeft = "-400px";
+    form.insertAdjacentElement("beforebegin", msg);
+  }
+
+  msg.textContent = text;
+}
+
+document.querySelector(".button-gerar").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const boxZone = document.querySelector(".box-zone");
+  if (!boxZone) return;
+
+  const wrappers = boxZone.querySelectorAll("div");
+  const formData = new FormData();
+
+  wrappers.forEach((wrapper, i) => {
+    const img = wrapper.querySelector("img");
+    fetch(img.src)
+      .then(res => res.blob())
+      .then(blob => {
+        formData.append("file", new File([blob], `image${i}.png`, { type: blob.type }));
+      });
+  });
+
+  setTimeout(async () => {
+    await fetch("/upload", { method: "POST", body: formData });
+    window.location.reload();
+  }, 500);
 });

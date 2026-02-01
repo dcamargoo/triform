@@ -1,24 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="icon"
-      href="{{ url_for('static', filename='images/favicon.ico') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <title>Triform</title>
   </head>
   <body>
     <header>
-      <img
-        src="{{ url_for('static', filename='images/logo_darkmode.png') }}"
-        alt="Logo Triform"
-      />
+      <img src="{{ url_for('static', filename='images/logo_darkmode.png') }}" alt="Logo Triform"/>
       <nav>
         <ul>
           <li>
@@ -44,10 +35,7 @@
               <input type="file" name="file" id="file" multiple="multiple" />
               <div class="drop-zone" id="drop-zone">
                 <div class="placeholder">
-                  <img
-                    src="{{ url_for('static', filename='images/icon_add_photo.png') }}"
-                    alt=""
-                  />
+                  <img src="{{ url_for('static', filename='images/icon_add_photo.png') }}" alt=""/>
                   <p>Selecione até 10 imagens ou solte elas aqui</p>
                 </div>
               </div>
@@ -64,7 +52,6 @@
             <canvas id="viewer-canvas"></canvas>
           </div>
 
-          <h2 id="viewer-status">Modelo Carregado com sucesso!</h2>
         </section>
       </section>
     </main>
@@ -72,15 +59,12 @@
     <footer>
       <p id="about-authors">
         &copy; 2026 Triform — Desenvolvido por Cláudio Dias e Daniel Camargo
-        <br />
-        Trabalho de Conclusão de Curso em Ciência da Computação. <br />
+        <br/>
+        Trabalho de Conclusão de Curso em Ciência da Computação. <br/>
         Universidade Presbiteriana Mackenzie.
       </p>
     </footer>
 
-    <script
-      type="module"
-      src="{{ url_for('static', filename='js/script.js') }}"
-    ></script>
+    <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
   </body>
 </html>

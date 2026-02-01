@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
 }
 
 /*variáveis de cores*/
@@ -17,6 +18,7 @@
   --upload-drop-hover-bg: #d6d6d640;
   --model-result-bg: #3c3c3c;
   --upload-text-shadow: #12121280;
+  --generate-button-disabled-color: #888888;
   --generate-button-color: #34cb79;
   --generate-button-hover-color: #34ae68;
   --success-color: #24ff53;
@@ -45,7 +47,7 @@ header {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 32px;
+  padding: 0 64px;
 }
 
 header img {
@@ -57,14 +59,11 @@ header img {
 p {
   color: var(--text-color);
   font-size: 16px;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-weight: Regular;
 }
 
-nav ul {
+nav ul { 
   display: flex;
   gap: 24px;
-  margin-right: 150px;
   list-style: none;
 }
 
@@ -76,8 +75,6 @@ nav a:hover {
 a {
   color: var(--text-color);
   font-size: 22px;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-weight: Regular;
   text-decoration: none;
 }
 
@@ -92,8 +89,6 @@ main {
 main h1 {
   color: var(--text-color);
   font-size: 32px;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-weight: bold;
   text-align: center;
 }
 
@@ -106,19 +101,20 @@ main h1 {
   margin: 60px 0 30px;
 }
 
-#generate .upload-card span {
+#generate .upload-card + span {
   color: var(--upload-aviso-color);
   font-weight: bold;
   margin-left: -350px;
 }
 
 #generate .upload-card .file-input {
-  width: 700px;
-  height: 350px;
+  width: 800px;
+  height: auto !important;
   background-color: var(--upload-card-bg);
   display: grid;
   grid-template-areas: "stack";
-  border-radius: 15px;
+  border-radius: 30px;
+  padding: 25px;
 }
 
 #generate .upload-card .file-input > * {
@@ -130,17 +126,16 @@ main h1 {
 }
 
 #generate .upload-card .file-input > .drop-zone {
-  margin: 15px;
   border: dashed 2px var(--upload-drop-border);
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 #generate .upload-card .file-input.active > .drop-zone {
-  margin: 14px;
   background-color: var(--upload-drop-hover-bg);
 }
 
 #generate .upload-card .drop-zone {
+  height: 400px;
   display: flex;
   flex-wrap: wrap;
   gap: 0 20px;
@@ -158,7 +153,15 @@ main h1 {
 
 #generate .upload-card .drop-zone p {
   text-shadow: var(--upload-text-shadow) 1px 0 20px;
-  width: 175px;
+  width: 300px;
+  font-weight: bold;
+}
+
+#generate .upload-card .drop-zone p span {
+  font-size: 12px;
+  font-weight: 100;
+  white-space: pre;
+  line-height: 2; 
 }
 
 #generate .upload-card .drop-zone #cover {
@@ -170,7 +173,7 @@ main h1 {
   object-fit: cover;
 }
 
-#generate .upload-card .file-input:hover {
+#generate .upload-card .drop-zone:hover {
   opacity: 0.5;
   transition-duration: 250ms;
   cursor: pointer;
@@ -184,7 +187,7 @@ main h1 {
 }
 
 /* ===== Botão Gerar ===== */
-#generate .button-gerar {
+#generate .button-enabled, .button-disabled {
   border: none;
   color: var(--text-color);
   background-color: var(--generate-button-color);
@@ -198,7 +201,12 @@ main h1 {
   border-radius: 15px;
 }
 
-#generate .button-gerar:hover {
+.button-disabled {
+  background: var(--);
+  cursor: not-allowed;
+}
+
+#generate .button-enabled:hover {
   background-color: var(--generate-button-hover-color);
   cursor: pointer;
 }
@@ -217,7 +225,6 @@ main h1 {
 #viewer-section #viewer-status {
   width: 100%;
   text-align: center;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
   color: var(--text-color);
   font-weight: bold;
 }
@@ -237,8 +244,8 @@ main h1 {
 }
 
 #viewer-canvas {
-  width: 100%;
-  height: 100%;
+  width: 800px;
+  height: auto !important;
   border-radius: 15px;
   background-color: var(--model-result-bg);
   display: block;
@@ -248,5 +255,5 @@ main h1 {
 footer {
   background-color: var(--header-footer-color);
   text-align: center;
-  padding: 32px;
+  padding: 28px;
 }
