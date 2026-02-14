@@ -1,8 +1,8 @@
-# importando o pycolmap e outras bibliotecas necessárias
 import pycolmap
 from pathlib import Path
+import shutil
 
-# função principal para executar o MVS (chamada no arquivo Flask)
+# função principal para executar o MVS (chamada no arquivo com Flask)
 def run_mvs():
     IMAGE_DIR = Path("../colmap/images")
     SPARSE_DIR = Path("../colmap/sparse/0")
@@ -11,8 +11,12 @@ def run_mvs():
     if not SPARSE_DIR.exists():
         raise RuntimeError("Modelo SfM não encontrado em 'colmap/sparse/0'")
 
-    # cria a pasta dense caso não exista
-    DENSE_DIR.mkdir(parents=True, exist_ok=True)
+    # limpa dense antigo
+    if DENSE_DIR.exists():
+        shutil.rmtree(DENSE_DIR)
+
+    # cria pasta nova
+    DENSE_DIR.mkdir(parents=True)
 
     # correção de distorção das imagens usando o modelo SfM
     pycolmap.undistort_images(
@@ -30,6 +34,6 @@ def run_mvs():
         workspace_path=DENSE_DIR
     )
 
-    print("MVS finalizado com sucesso")
+    print("MVS finalizado com sucesso!")
 
-# run_mvs() teste local
+#run_mvs() # teste local

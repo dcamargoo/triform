@@ -1,4 +1,3 @@
-/* ===== OPEN 3D ===== */
 import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
 function initViewer() {
@@ -23,7 +22,7 @@ function initViewer() {
 
   const cube = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshNormalMaterial()
+    new THREE.MeshNormalMaterial(),
   );
   scene.add(cube);
 
@@ -54,7 +53,7 @@ window.addEventListener("DOMContentLoaded", () => {
   updateButtonState();
 });
 
-/* ===== UPLOAD ===== */
+// Drag and Drop das imagens
 const dropzone = document.querySelector("#drop-zone");
 const label = document.querySelector("label.file-input");
 const input = document.querySelector("input[type='file']");
@@ -79,8 +78,12 @@ function updateButtonState() {
   }
 }
 
-function onEnter() { label.classList.add("active"); }
-function onLeave() { label.classList.remove("active"); }
+function onEnter() {
+  label.classList.add("active");
+}
+function onLeave() {
+  label.classList.remove("active");
+}
 
 label.addEventListener("dragenter", onEnter);
 label.addEventListener("dragleave", onLeave);
@@ -124,7 +127,7 @@ input.addEventListener("change", () => {
 
   const validFormats = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
 
-  files.slice(0, spacesLeft).forEach(file => {
+  files.slice(0, spacesLeft).forEach((file) => {
     const fileID = `${file.name}-${file.size}`;
 
     if (addedImages.has(fileID)) {
@@ -175,7 +178,7 @@ input.addEventListener("change", () => {
     boxZone.appendChild(wrapper);
   });
 
-  input.value = ""; 
+  input.value = "";
   updateButtonState();
 });
 
@@ -206,9 +209,12 @@ document.querySelector(".button-gerar").addEventListener("click", async (e) => {
   wrappers.forEach((wrapper, i) => {
     const img = wrapper.querySelector("img");
     fetch(img.src)
-      .then(res => res.blob())
-      .then(blob => {
-        formData.append("file", new File([blob], `image${i}.png`, { type: blob.type }));
+      .then((res) => res.blob())
+      .then((blob) => {
+        formData.append(
+          "file",
+          new File([blob], `image${i}.png`, { type: blob.type }),
+        );
       });
   });
 

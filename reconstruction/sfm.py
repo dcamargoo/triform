@@ -1,17 +1,28 @@
-# importando o pycolmap e outras bibliotecas necessárias
 import pycolmap
 from pathlib import Path
+import shutil
 
-# função principal para executar o SfM (chamada no arquivo Flask)
+# função principal para executar o SfM (chamada no arquivo com Flask)
 def run_sfm():
-    IMAGE_DIR = Path("../colmap/images")
-    SPARSE_DIR = Path("../colmap/sparse")
     DATASET_PATH = Path("../colmap")
+    IMAGE_DIR = Path("../colmap/images")
+    SPARSE_DIR = Path("../colmap/sparse/0")
+    SPARSE_ROOT = DATASET_PATH / "sparse"
 
     if not IMAGE_DIR.exists():
         raise RuntimeError("Pasta 'images' não encontrada")
 
+    # limpa sparse antigo
+    if SPARSE_ROOT.exists():
+        shutil.rmtree(SPARSE_ROOT)
+
+    SPARSE_DIR.mkdir(parents=True)
+
     database = DATASET_PATH / "database.db"
+
+    # remove o banco de dados existente para evitar conflitos
+    if database.exists():
+        database.unlink()
 
     # detecção e descrição de features com SIFT
     pycolmap.extract_features(database, IMAGE_DIR)
@@ -29,4 +40,6 @@ def run_sfm():
 
     maps[0].write(SPARSE_DIR)
 
-# run_sfm() teste local
+    print("SfM finalizado com sucesso!")
+
+#run_sfm() # teste local
