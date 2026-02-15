@@ -1,68 +1,18 @@
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-
-function initViewer() {
-  const canvas = document.getElementById("viewer-canvas");
-  if (!canvas) return;
-
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: true,
-  });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-  const scene = new THREE.Scene();
-
-  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-  camera.position.set(0, 0, 2.5);
-
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(2, 2, 2);
-  scene.add(light);
-
-  const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshNormalMaterial(),
-  );
-  scene.add(cube);
-
-  function resize() {
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    if (w === 0 || h === 0) return;
-
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-
-  function animate() {
-    resize();
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-    renderer.render(scene, camera);
-    requestAnimationFrame(animate);
-  }
-
-  window.addEventListener("resize", resize);
-  animate();
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  initViewer();
-  updateButtonState();
-});
-
-// Drag and Drop das imagens
+// captura dos elementos principais da interface
 const dropzone = document.querySelector("#drop-zone");
 const label = document.querySelector("label.file-input");
 const input = document.querySelector("input[type='file']");
+
+// estrutura para evitar adicionar imagens duplicadas
 const addedImages = new Set();
+
+// limite máximo de imagens permitido para o SfM
 const maxImages = 10;
 
+// função responsável por ativar/desativar o botão GERAR ele só é habilitado quando existir pelo menos uma imagem selecionada
 function updateButtonState() {
   const boxZone = document.querySelector(".box-zone");
-  const button = document.querySelector(".button-gerar");
+  const button = document.querySelector("input[type='submit']");
   if (!button) return;
 
   const hasImages = boxZone && boxZone.querySelectorAll("img").length > 0;
@@ -78,13 +28,16 @@ function updateButtonState() {
   }
 }
 
+// efeitos visuais ao arrastar arquivos sobre a área de upload
 function onEnter() {
   label.classList.add("active");
 }
+
 function onLeave() {
   label.classList.remove("active");
 }
 
+// eventos de drag and drop
 label.addEventListener("dragenter", onEnter);
 label.addEventListener("dragleave", onLeave);
 label.addEventListener("dragend", onLeave);
@@ -92,19 +45,25 @@ label.addEventListener("dragover", (e) => {
   e.preventDefault();
   label.classList.add("active");
 });
+
+// quando o usuário solta arquivos na área os arquivos são transferidos para o input e tratados normalmente
 label.addEventListener("drop", (e) => {
   e.preventDefault();
   onLeave();
+
   const files = Array.from(e.dataTransfer.files);
+
   input.files = e.dataTransfer.files;
   input.dispatchEvent(new Event("change"));
 });
 
+// ao clicar na área de upload, cria dinamicamente o container onde as miniaturas das imagens serão exibidas
 dropzone.addEventListener("click", () => {
   if (!document.querySelector(".box-zone")) {
     const boxZone = document.createElement("div");
     boxZone.classList.add("box-zone");
 
+    // estilos da área onde ficam as imagens selecionadas
     boxZone.style.marginTop = "10px";
     boxZone.style.display = "flex";
     boxZone.style.flexWrap = "wrap";
@@ -116,7 +75,9 @@ dropzone.addEventListener("click", () => {
   }
 });
 
+// quando novas imagens são selecionadas cria miniaturas + botão de remover
 input.addEventListener("change", () => {
+
   const files = Array.from(input.files);
   const boxZone = document.querySelector(".box-zone");
   if (!boxZone) return;
@@ -125,11 +86,14 @@ input.addEventListener("change", () => {
   const spacesLeft = maxImages - currentImages;
   if (spacesLeft <= 0) return;
 
+  // formatos aceitos pelo pipeline SfM
   const validFormats = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
 
   files.slice(0, spacesLeft).forEach((file) => {
+
     const fileID = `${file.name}-${file.size}`;
 
+    // impede adicionar a mesma imagem duas vezes
     if (addedImages.has(fileID)) {
       showMessage("* Essa imagem já foi selecionada anteriormente.");
       return;
@@ -139,6 +103,7 @@ input.addEventListener("change", () => {
 
     addedImages.add(fileID);
 
+    // container individual da imagem
     const wrapper = document.createElement("div");
     wrapper.style.position = "relative";
     wrapper.style.width = "128px";
@@ -147,6 +112,7 @@ input.addEventListener("change", () => {
     wrapper.style.alignItems = "center";
     wrapper.style.justifyContent = "center";
 
+    // criação da miniatura
     const img = document.createElement("img");
     img.src = URL.createObjectURL(file);
     img.style.width = "100%";
@@ -154,6 +120,7 @@ input.addEventListener("change", () => {
     img.style.objectFit = "cover";
     img.style.borderRadius = "15px";
 
+    // botão para remover imagem da lista
     const removeBtn = document.createElement("button");
     removeBtn.innerText = "X";
     removeBtn.style.position = "absolute";
@@ -166,6 +133,7 @@ input.addEventListener("change", () => {
     removeBtn.style.color = "#D7D7D7";
     removeBtn.style.cursor = "pointer";
 
+    // remove a imagem selecionada
     removeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       wrapper.remove();
@@ -182,6 +150,7 @@ input.addEventListener("change", () => {
   updateButtonState();
 });
 
+// exibe mensagens de erro ao usuário
 function showMessage(text) {
   let msg = document.querySelector(".msg-erro");
   const form = document.querySelector("#generate form .file-input");
@@ -198,16 +167,20 @@ function showMessage(text) {
   msg.textContent = text;
 }
 
-document.querySelector(".button-gerar").addEventListener("click", async (e) => {
+// envio das imagens para o backend Flask cria um FormData com todas as imagens e chama a rota /upload
+document.querySelector("input[type='submit']").addEventListener("click", async (e) => {
   e.preventDefault();
+
   const boxZone = document.querySelector(".box-zone");
   if (!boxZone) return;
 
   const wrappers = boxZone.querySelectorAll("div");
   const formData = new FormData();
 
+  // converte as miniaturas em arquivos novamente
   wrappers.forEach((wrapper, i) => {
     const img = wrapper.querySelector("img");
+
     fetch(img.src)
       .then((res) => res.blob())
       .then((blob) => {
@@ -218,6 +191,7 @@ document.querySelector(".button-gerar").addEventListener("click", async (e) => {
       });
   });
 
+  // pequena espera para garantir que os blobs foram adicionados
   setTimeout(async () => {
     await fetch("/upload", { method: "POST", body: formData });
     window.location.reload();

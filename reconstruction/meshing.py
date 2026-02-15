@@ -1,12 +1,13 @@
 import open3d as o3d
+from pathlib import Path
 import os
 import numpy as np
 
 # gerando a malha com Poisson Surface Reconstruction, usando a nuvem de pontos densa gerada pelo MVS e otimizando a malha resultante (removendo partes ruins e suavizando)
 def generate_mesh():
-
-    FUSED_PATH = "../colmap/dense/fused.ply"
-    OUTPUT_PATH = "../static/models/mesh.ply"
+    DATASET_PATH = Path("colmap")
+    FUSED_PATH = DATASET_PATH / "dense" / "fused.ply"
+    OUTPUT_PATH = Path("static") / "models" / "mesh.ply"
 
     if not os.path.exists(FUSED_PATH):
         raise RuntimeError("fused.ply não encontrado! Rode o MVS primeiro.")

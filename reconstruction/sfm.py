@@ -4,9 +4,9 @@ import shutil
 
 # função principal para executar o SfM (chamada no arquivo com Flask)
 def run_sfm():
-    DATASET_PATH = Path("../colmap")
-    IMAGE_DIR = Path("../colmap/images")
-    SPARSE_DIR = Path("../colmap/sparse/0")
+    DATASET_PATH = Path("colmap")
+    IMAGE_DIR = DATASET_PATH / "images"
+    SPARSE_DIR = DATASET_PATH / "sparse" / "0"
     SPARSE_ROOT = DATASET_PATH / "sparse"
 
     if not IMAGE_DIR.exists():
