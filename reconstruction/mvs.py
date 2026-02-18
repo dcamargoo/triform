@@ -4,10 +4,10 @@ import shutil
 
 # função principal para executar o MVS (chamada no arquivo com Flask)
 def run_mvs():
-    DATASET_PATH = Path("colmap")
-    IMAGE_DIR = DATASET_PATH / "images"
-    SPARSE_DIR = DATASET_PATH / "sparse" / "0"
-    DENSE_DIR = DATASET_PATH / "dense"
+    COLMAP_PATH = Path("colmap")
+    IMAGE_DIR = COLMAP_PATH / "images"
+    SPARSE_DIR = COLMAP_PATH / "sparse" / "0"
+    DENSE_DIR = COLMAP_PATH / "dense"
 
     if not SPARSE_DIR.exists():
         raise RuntimeError("Modelo SfM não encontrado em 'colmap/sparse/0'")

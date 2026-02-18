@@ -4,10 +4,10 @@ import shutil
 
 # função principal para executar o SfM (chamada no arquivo com Flask)
 def run_sfm():
-    DATASET_PATH = Path("colmap")
-    IMAGE_DIR = DATASET_PATH / "images"
-    SPARSE_DIR = DATASET_PATH / "sparse" / "0"
-    SPARSE_ROOT = DATASET_PATH / "sparse"
+    COLMAP_PATH = Path("colmap")
+    IMAGE_DIR = COLMAP_PATH / "images"
+    SPARSE_ROOT = COLMAP_PATH / "sparse"
+    SPARSE_DIR = COLMAP_PATH / "sparse" / "0"
 
     if not IMAGE_DIR.exists():
         raise RuntimeError("Pasta 'images' não encontrada")
@@ -18,7 +18,7 @@ def run_sfm():
 
     SPARSE_DIR.mkdir(parents=True)
 
-    database = DATASET_PATH / "database.db"
+    database = COLMAP_PATH / "database.db"
 
     # remove o banco de dados existente para evitar conflitos
     if database.exists():

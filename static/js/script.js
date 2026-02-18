@@ -7,7 +7,7 @@ const input = document.querySelector("input[type='file']");
 const addedImages = new Set();
 
 // limite máximo de imagens permitido para o SfM
-const maxImages = 10;
+const maxImages = 100;
 
 // função responsável por ativar/desativar o botão GERAR ele só é habilitado quando existir pelo menos uma imagem selecionada
 function updateButtonState() {
@@ -77,7 +77,6 @@ dropzone.addEventListener("click", () => {
 
 // quando novas imagens são selecionadas cria miniaturas + botão de remover
 input.addEventListener("change", () => {
-
   const files = Array.from(input.files);
   const boxZone = document.querySelector(".box-zone");
   if (!boxZone) return;
@@ -90,7 +89,6 @@ input.addEventListener("change", () => {
   const validFormats = ["image/png", "image/jpg", "image/jpeg", "image/webp"];
 
   files.slice(0, spacesLeft).forEach((file) => {
-
     const fileID = `${file.name}-${file.size}`;
 
     // impede adicionar a mesma imagem duas vezes
@@ -168,32 +166,34 @@ function showMessage(text) {
 }
 
 // envio das imagens para o backend Flask cria um FormData com todas as imagens e chama a rota /upload
-document.querySelector("input[type='submit']").addEventListener("click", async (e) => {
-  e.preventDefault();
+document
+  .querySelector("input[type='submit']")
+  .addEventListener("click", async (e) => {
+    e.preventDefault();
 
-  const boxZone = document.querySelector(".box-zone");
-  if (!boxZone) return;
+    const boxZone = document.querySelector(".box-zone");
+    if (!boxZone) return;
 
-  const wrappers = boxZone.querySelectorAll("div");
-  const formData = new FormData();
+    const wrappers = boxZone.querySelectorAll("div");
+    const formData = new FormData();
 
-  // converte as miniaturas em arquivos novamente
-  wrappers.forEach((wrapper, i) => {
-    const img = wrapper.querySelector("img");
+    // converte as miniaturas em arquivos novamente
+    wrappers.forEach((wrapper, i) => {
+      const img = wrapper.querySelector("img");
 
-    fetch(img.src)
-      .then((res) => res.blob())
-      .then((blob) => {
-        formData.append(
-          "file",
-          new File([blob], `image${i}.png`, { type: blob.type }),
-        );
-      });
+      fetch(img.src)
+        .then((res) => res.blob())
+        .then((blob) => {
+          formData.append(
+            "file",
+            new File([blob], `image${i}.png`, { type: blob.type }),
+          );
+        });
+    });
+
+    // pequena espera para garantir que os blobs foram adicionados
+    setTimeout(async () => {
+      await fetch("/upload", { method: "POST", body: formData });
+      window.location.reload();
+    }, 500);
   });
-
-  // pequena espera para garantir que os blobs foram adicionados
-  setTimeout(async () => {
-    await fetch("/upload", { method: "POST", body: formData });
-    window.location.reload();
-  }, 500);
-});

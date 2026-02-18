@@ -1,23 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='images/favicon.ico') }}"
+    />
     <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.156.0/build/three.module.js"
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.156.0/build/three.module.js"
+        }
       }
-    }
     </script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
     <title>Triform</title>
   </head>
   <body>
     <header>
-      <img src="{{ url_for('static', filename='images/logo_darkmode.png') }}" alt="Logo Triform"/>
+      <img
+        src="{{ url_for('static', filename='images/logo_darkmode.png') }}"
+        alt="Logo Triform"
+      />
       <nav>
         <ul>
           <li>
@@ -35,7 +44,7 @@
 
     <main>
       <section id="generate">
-        <h1>Transforme suas imagens em modelos 3D em poucos segundos</h1>
+        <h1>Transforme suas imagens em modelos 3D em instantes</h1>
 
         <form action="/upload" method="post" enctype="multipart/form-data">
           <div class="upload-card">
@@ -43,8 +52,14 @@
               <input type="file" name="file" id="file" multiple="multiple" />
               <div class="drop-zone" id="drop-zone">
                 <div class="placeholder">
-                  <img src="{{ url_for('static', filename='images/icon_add_photo.png') }}" alt=""/>
-                  <p>Arraste até 10 imagens aqui <span>ou clique para selecionar - PNG, JPG, WEBP</span></p>
+                  <img
+                    src="{{ url_for('static', filename='images/icon_add_photo.png') }}"
+                    alt=""
+                  />
+                  <p>
+                    Arraste até 100 imagens aqui
+                    <span>ou clique para selecionar - PNG, JPG, WEBP</span>
+                  </p>
                 </div>
               </div>
             </label>
@@ -59,7 +74,6 @@
           <div class="viewer-container">
             <canvas id="viewer-canvas"></canvas>
           </div>
-
         </section>
       </section>
     </main>
@@ -67,13 +81,16 @@
     <footer>
       <p id="about-authors">
         &copy; 2026 Triform — Desenvolvido por Cláudio Dias e Daniel Camargo
-        <br/>
-        Trabalho de Conclusão de Curso em Ciência da Computação. <br/>
+        <br />
+        Trabalho de Conclusão de Curso em Ciência da Computação. <br />
         Universidade Presbiteriana Mackenzie.
       </p>
     </footer>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/viewer.js') }}"></script>
+    <script
+      type="module"
+      src="{{ url_for('static', filename='js/viewer.js') }}"
+    ></script>
   </body>
 </html>
