@@ -5,7 +5,6 @@ import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.156.0/exampl
 
 // aguarda o carregamento completo do DOM para garantir que o canvas já existe
 window.addEventListener("DOMContentLoaded", () => {
-
   // captura o elemento canvas onde o modelo será renderizado
   const canvas = document.getElementById("viewer-canvas");
   if (!canvas) {
@@ -17,25 +16,28 @@ window.addEventListener("DOMContentLoaded", () => {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x111111);
 
+  // define o eixo Z como "para cima" para compatibilidade com modelos gerados pelo COLMAP/Open3D
+  THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
+
   // configuração da câmera em perspectiva responsável por definir o campo de visão e a posição inicial do observador
   const camera = new THREE.PerspectiveCamera(
     60,
     canvas.clientWidth / canvas.clientHeight,
     0.1,
-    10000
+    10000,
   );
   camera.position.set(0, 0, 10);
 
   // criação do renderer WebGL que desenha a cena no canvas
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
-    canvas: canvas
+    canvas: canvas,
   });
   renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
   // controles interativos de navegação (OrbitControls) permite rotacionar, dar zoom e mover a câmera com o mouse
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;        // movimento suave
+  controls.enableDamping = true; // movimento suave
   controls.dampingFactor = 0.05;
 
   controls.enableZoom = true;
@@ -59,7 +61,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const loader = new PLYLoader();
 
   // carregamento da malha gerada pelo pipeline (meshing.py)
-  loader.load("/static/models/mesh.ply",
+  loader.load(
+    "/static/models/mesh.ply",
     (geometry) => {
       // cálculo das normais para melhorar a iluminação da superfície
       geometry.computeVertexNormals();
@@ -68,11 +71,14 @@ window.addEventListener("DOMContentLoaded", () => {
       const material = new THREE.MeshStandardMaterial({
         color: 0xdddddd,
         metalness: 0.1,
-        roughness: 0.8
+        roughness: 0.8,
       });
 
       // criação do objeto 3D a partir da geometria carregada
       const mesh = new THREE.Mesh(geometry, material);
+
+      // ajuste de orientação para alinhar o modelo gerado pelo COLMAP com o sistema de eixos do Three.js
+      mesh.rotation.x = -Math.PI / 2;
 
       // cálculo da bounding box para centralizar o modelo na cena
       const box = new THREE.Box3().setFromObject(mesh);
@@ -97,7 +103,7 @@ window.addEventListener("DOMContentLoaded", () => {
       animate();
     },
     undefined,
-    (error) => console.error("Erro no loader:", error)
+    (error) => console.error("Erro no loader:", error),
   );
 
   // loop principal de renderização responsável por atualizar os controles e redesenhar a cena a cada frame
@@ -113,5 +119,4 @@ window.addEventListener("DOMContentLoaded", () => {
     camera.updateProjectionMatrix();
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
   });
-
 });
