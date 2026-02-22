@@ -16,17 +16,22 @@ def run_mvs(image_dir=None):
         shutil.rmtree(DENSE_DIR)
     DENSE_DIR.mkdir(parents=True)
 
+    # prepara o MVS usando a nuvem de pontos gerada pelo SfM e as imagens originais
     pycolmap.undistort_images(
         output_path=DENSE_DIR,
         image_path=IMAGE_DIR,
         input_path=SPARSE_DIR
     )
 
+    # executa o PatchMatch Stereo para gerar a nuvem de pontos densa e calcular as profundidades
     pycolmap.patch_match_stereo(DENSE_DIR)
+
+    # executa a remoção de outliers e a fusão para criar a nuvem de pontos final
     pycolmap.stereo_fusion(
         output_path=DENSE_DIR / "fused.ply",
         workspace_path=DENSE_DIR
     )
+    
     print("MVS finalizado com sucesso!")
 
 # run_mvs() # teste local

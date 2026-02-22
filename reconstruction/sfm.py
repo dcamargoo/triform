@@ -21,8 +21,13 @@ def run_sfm(image_dir=None):
     if database.exists():
         database.unlink()
 
+    # executa o SIFT (detector e descritor)
     pycolmap.extract_features(database, IMAGE_DIR)
+    
+    # executa o matching (encontra correspondências entre as imagens) e executa o RANSAC para filtrar correspondências erradas
     pycolmap.match_exhaustive(database)
+    
+    # executa a triangulação incremental e o bundle adjustment para criar a reconstrução 3D
     maps = pycolmap.incremental_mapping(database, IMAGE_DIR, SPARSE_DIR)
 
     if len(maps) == 0:

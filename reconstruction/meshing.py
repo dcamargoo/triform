@@ -50,7 +50,7 @@ def generate_mesh():
     mesh = mesh.filter_smooth_taubin(number_of_iterations=10)
     mesh.compute_vertex_normals()
 
-    # remove vértices inválidos (NaN/Inf) que quebram o Three.js
+    # remove vértices inválidos (NaN/Inf)
     vertices = np.asarray(mesh.vertices)
     valid = np.isfinite(vertices).all(axis=1)
     mesh.remove_vertices_by_mask(~valid)

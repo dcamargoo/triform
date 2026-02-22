@@ -4,7 +4,7 @@ from PIL import Image
 import rembg
 from pathlib import Path
 
-# Correção de Balanço de Branco
+# balanço de branco com LAB
 def white_balance(img):
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB).astype(np.float32)
     L, A, B = cv2.split(lab)
@@ -29,7 +29,7 @@ def aplicar_clahe_colorido(img):
     lab_clahe = cv2.merge((l2, a, b))
     return cv2.cvtColor(lab_clahe, cv2.COLOR_LAB2BGR)
 
-# Remover fundo
+# remover fundo
 def remover_fundo(caminho_entrada, caminho_saida):
     img = Image.open(caminho_entrada)
     resultado = rembg.remove(img)
@@ -54,7 +54,7 @@ def preprocess_image(input_path, output_base_dir):
 
     filename = Path(input_path).stem + ".png"
 
-    # 1) Processamento de cor
+    # processamento de cor
     wb = white_balance(img)
     bilateral = aplicar_bilateral(wb)
     clahe = aplicar_clahe_colorido(bilateral)
@@ -68,18 +68,18 @@ def preprocess_image(input_path, output_base_dir):
     gray = cv2.cvtColor(clahe, cv2.COLOR_BGR2GRAY)
     cv2.imwrite(str(out_gray), gray)
 
-    # 2) Remover fundo
+    # remover fundo
     out_color_nofg = dir_sem_fundo / filename
     remover_fundo(str(out_color), str(out_color_nofg))
 
-    # 3) Converte para cinza sem fundo
+    # converte para cinza sem fundo
     out_gray_nofg = dir_sem_fundo_gray / filename
     img_final = cv2.imread(str(out_color_nofg))
     if img_final is not None:
         img_final_gray = cv2.cvtColor(img_final, cv2.COLOR_BGR2GRAY)
         cv2.imwrite(str(out_gray_nofg), img_final_gray)
 
-    print("[PREPROCESS] Arquivos gerados:")
+    print("[PREPROCESSAMENTO] Arquivos gerados:")
     print(f" - Com fundo: {out_color}")
     print(f" - Com fundo cinza: {out_gray}")
     print(f" - Sem fundo: {out_color_nofg}")

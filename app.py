@@ -17,10 +17,10 @@ def serve_models(filename):
 def upload():
     files = request.files.getlist('file')
 
-    ORIGINAL_DIR = Path("colmap/images")               # apenas originais
-    PROCESSED_DIR = Path("colmap/images_processed")    # apenas tratadas
+    ORIGINAL_DIR = Path("colmap/images")               
+    PROCESSED_DIR = Path("colmap/images_processed")    
 
-    # criar pastas, se não existirem
+    # criar pastas se não existirem
     ORIGINAL_DIR.mkdir(parents=True, exist_ok=True)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -42,7 +42,7 @@ def upload():
                 output_base_dir=str(PROCESSED_DIR)
             )
 
-    # usa apenas a subpasta sem_fundo
+    # usa apenas a subpasta selecionada
     sfm_input_dir = PROCESSED_DIR / "sem_fundo"
 
     sfm.run_sfm(str(sfm_input_dir))
