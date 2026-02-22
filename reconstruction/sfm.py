@@ -42,4 +42,4 @@ def run_sfm():
 
     print("SfM finalizado com sucesso!")
 
-#run_sfm() # teste local
+# run_sfm() # teste local

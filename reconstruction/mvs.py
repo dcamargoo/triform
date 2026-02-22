@@ -37,4 +37,4 @@ def run_mvs():
 
     print("MVS finalizado com sucesso!")
 
-#run_mvs() # teste local
+# run_mvs() # teste local
