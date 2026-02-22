@@ -20,6 +20,7 @@ def upload():
     ORIGINAL_DIR = Path("colmap/images")               # apenas originais
     PROCESSED_DIR = Path("colmap/images_processed")    # apenas tratadas
 
+    # criar pastas, se não existirem
     ORIGINAL_DIR.mkdir(parents=True, exist_ok=True)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -41,9 +42,11 @@ def upload():
                 output_base_dir=str(PROCESSED_DIR)
             )
 
-    # agora o SfM usa APENAS images_processed
-    sfm.run_sfm()
-    mvs.run_mvs()
+    # usa apenas a subpasta sem_fundo
+    sfm_input_dir = PROCESSED_DIR / "sem_fundo"
+
+    sfm.run_sfm(str(sfm_input_dir))
+    mvs.run_mvs(str(sfm_input_dir))
     meshing.generate_mesh()
 
     return redirect('/')
