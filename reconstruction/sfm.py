@@ -20,7 +20,7 @@ def run_sfm(image_dir=None):
     database = COLMAP_PATH / "database.db"
     if database.exists():
         database.unlink()
-
+    
     # executa o SIFT (detector e descritor)
     pycolmap.extract_features(database, IMAGE_DIR)
     
@@ -35,7 +35,11 @@ def run_sfm(image_dir=None):
     else:
         print("Reconstruções válidas:", len(maps))
 
-    maps[0].write(SPARSE_DIR)
+    largest_map = max(maps.values(), key=lambda m: m.num_images())
+    largest_map.write(SPARSE_DIR)
+
+    print("Imagens reconstruídas:", largest_map.num_images())
+    print("Pontos 3D:", largest_map.num_points3D())
     print("SfM finalizado com sucesso!")
 
 # run_sfm() # teste local

@@ -20,13 +20,19 @@ def generate_mesh():
         std_ratio=2.0
     )
 
-    # estima normais (orientação)
+    # estima normais (orientação) de acordo com o tamanho da cena
+    bbox = pointCloud.get_axis_aligned_bounding_box()
+    diag = np.linalg.norm(bbox.get_extent())
+    radius = diag * 0.01
     pointCloud.estimate_normals(
         search_param=o3d.geometry.KDTreeSearchParamHybrid(
-            radius=0.02,
+            radius=radius,
             max_nn=30
         )
     )
+
+    # orientando as normais de forma consistente para evitar problemas na geração da malha
+    pointCloud.orient_normals_consistent_tangent_plane(100)
 
     # gerando a malha usando Poisson Surface Reconstruction
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
@@ -47,7 +53,7 @@ def generate_mesh():
     mesh.remove_non_manifold_edges()
 
     # suavização taubin
-    mesh = mesh.filter_smooth_taubin(number_of_iterations=10)
+    mesh = mesh.filter_smooth_taubin(number_of_iterations=5)
     mesh.compute_vertex_normals()
 
     # remove vértices inválidos (NaN/Inf)

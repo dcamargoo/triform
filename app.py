@@ -6,50 +6,51 @@ import shutil
 app = Flask(__name__)
 
 @app.route("/")
-def homepage():
+def home():
     return render_template("index.html")
+
 
 @app.route("/models/<path:filename>")
 def serve_models(filename):
     return send_from_directory(Path("static/models").resolve(), filename)
 
-@app.route('/upload', methods=['POST'])
+
+@app.route("/upload", methods=["POST"])
 def upload():
-    files = request.files.getlist('file')
 
-    ORIGINAL_DIR = Path("colmap/images")               
-    PROCESSED_DIR = Path("colmap/images_processed")    
+    uploaded_files = request.files.getlist("file")
+    strategy = "sem_fundo"
 
-    # criar pastas se não existirem
-    ORIGINAL_DIR.mkdir(parents=True, exist_ok=True)
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    original_dir = Path("colmap/images")
+    processed_dir = Path("colmap/images_processed")
 
-    # limpar imagens processadas antigas
-    if PROCESSED_DIR.exists():
-        shutil.rmtree(PROCESSED_DIR)
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    # limpa imagens processadas anteriores
+    if processed_dir.exists():
+        shutil.rmtree(processed_dir)
 
-    for file in files:
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    original_dir.mkdir(parents=True, exist_ok=True)
+
+    # aplica o pré-processamento em cada imagem e salva na pasta de entrada do SfM
+    for file in uploaded_files:
         if file.filename:
-            original_path = ORIGINAL_DIR / file.filename
-
-            # salvar ORIGINAL
+            original_path = original_dir / file.filename
             file.save(original_path)
 
-            # gerar versões processadas em subpastas
             preprocessing.preprocess_image(
                 input_path=str(original_path),
-                output_base_dir=str(PROCESSED_DIR)
+                output_base_dir=str(processed_dir),
+                strategy=strategy
             )
 
-    # usa apenas a subpasta selecionada
-    sfm_input_dir = PROCESSED_DIR / "sem_fundo"
+    sfm_input_dir = processed_dir / strategy
 
     sfm.run_sfm(str(sfm_input_dir))
     mvs.run_mvs(str(sfm_input_dir))
     meshing.generate_mesh()
 
-    return redirect('/')
+    return redirect("/")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
