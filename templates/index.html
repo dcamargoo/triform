@@ -1,96 +1,95 @@
 <!doctype html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="icon"
-      href="{{ url_for('static', filename='images/favicon.ico') }}"
-    />
-    <script type="importmap">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+  <script type="importmap">
       {
         "imports": {
           "three": "https://cdn.jsdelivr.net/npm/three@0.156.0/build/three.module.js"
         }
       }
     </script>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-    <title>Triform</title>
-  </head>
-  <body>
-    <header>
-      <img
-        src="{{ url_for('static', filename='images/logo_darkmode.png') }}"
-        alt="Logo Triform"
-      />
-      <nav>
-        <ul>
-          <li>
-            <a href="#"><strong>Gerar</strong></a>
-          </li>
-          <li>
-            <a href="#"><strong>Tutorial</strong></a>
-          </li>
-          <li>
-            <a href="#"><strong>Sobre os Autores</strong></a>
-          </li>
-        </ul>
-      </nav>
-    </header>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <title>Triform</title>
+</head>
 
-    <main>
-      <section id="generate">
-        <h1>Transforme suas imagens em modelos 3D em instantes</h1>
-
-        <form action="/upload" method="post" enctype="multipart/form-data">
-          <div class="upload-card">
-            <label for="file" class="file-input">
-              <input type="file" name="file" id="file" multiple="multiple" />
-              <div class="drop-zone" id="drop-zone">
-                <div class="placeholder">
-                  <img
-                    src="{{ url_for('static', filename='images/icon_add_photo.png') }}"
-                    alt=""
-                  />
-                  <p>
-                    Arraste até 100 imagens aqui
-                    <span>ou clique para selecionar - PNG, JPG, WEBP</span>
-                  </p>
-                </div>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='images/logo_darkmode.png') }}" alt="Logo Triform" />
+    <nav>
+      <ul>
+        <li>
+          <a href="#"><strong>Gerar</strong></a>
+        </li>
+        <li>
+          <a href="#"><strong>Tutorial</strong></a>
+        </li>
+        <li>
+          <a href="#"><strong>Sobre os Autores</strong></a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section id="generate">
+      <h1>Transforme suas imagens em modelos 3D em instantes</h1>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="upload-card">
+          <label for="file" class="file-input">
+            <input type="file" name="file" id="file" multiple="multiple" />
+            <div class="drop-zone" id="drop-zone">
+              <div class="placeholder">
+                <img src="{{ url_for('static', filename='images/icon_add_photo.png') }}" alt="" />
+                <p>
+                  Arraste até 100 imagens aqui
+                  <span>ou clique para selecionar - PNG, JPG, WEBP</span>
+                </p>
               </div>
-            </label>
+            </div>
+          </label>
+        </div>
+        <input class="button-disabled" type="submit" value="GERAR" />
+      </form>
+    </section>
+    <section id="progress-section" style="display:none">
+      <h2>Gerando modelo 3D</h2>
+      <div id="progress-viewer">
+        <div id="progress-text">Iniciando...</div>
+        <div id="progress-bar-container">
+          <div id="progress-bar"></div>
+        </div>
+      </div>
+      <button id="cancel-btn">CANCELAR</button>
+    </section>
+    <section id="viewer-section">
+      <h2>Visualização do Modelo 3D</h2>
+      <div class="viewer-container">
+        <div class="download-menu">
+          <img id="download-btn" src="{{ url_for('static', filename='images/icon_download.png') }}" alt="Download" />
+          <div class="download-options" id="download-options">
+            <button data-format="obj">OBJ</button>
+            <button data-format="ply">PLY</button>
+            <button data-format="stl">STL</button>
+            <button data-format="glb">GLB</button>
           </div>
+        </div>
+        <canvas id="viewer-canvas"></canvas>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p id="about-authors">
+      &copy; 2026 Triform — Desenvolvido por Cláudio Dias e Daniel Camargo
+      <br />
+      Trabalho de Conclusão de Curso em Ciência da Computação. <br />
+      Universidade Presbiteriana Mackenzie.
+    </p>
+  </footer>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/viewer.js') }}"></script>
+</body>
 
-          <input class="button-disabled" type="submit" value="GERAR" />
-        </form>
-
-        <section id="viewer-section">
-          <h2>Visualização do Modelo 3D</h2>
-
-          <div class="viewer-container">
-            <canvas id="viewer-canvas"></canvas>
-          </div>
-        </section>
-      </section>
-    </main>
-
-    <footer>
-      <p id="about-authors">
-        &copy; 2026 Triform — Desenvolvido por Cláudio Dias e Daniel Camargo
-        <br />
-        Trabalho de Conclusão de Curso em Ciência da Computação. <br />
-        Universidade Presbiteriana Mackenzie.
-      </p>
-    </footer>
-
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script
-      type="module"
-      src="{{ url_for('static', filename='js/viewer.js') }}"
-    ></script>
-  </body>
 </html>

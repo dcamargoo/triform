@@ -1,10 +1,18 @@
-from flask import Flask, render_template, request, redirect, send_from_directory
+from flask import Flask, render_template, request, send_file, jsonify
 from reconstruction import sfm, mvs, meshing, preprocessing
 from pathlib import Path
 import shutil
+import threading
+import time
 
 app = Flask(__name__)
 
+# variáveis globais de estado
+current_stage = "idle"
+cancel_flag = False
+pipeline_thread = None
+
+# ===== Rotas =====
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -12,11 +20,13 @@ def home():
 
 @app.route("/models/<path:filename>")
 def serve_models(filename):
-    return send_from_directory(Path("static/models").resolve(), filename)
+    return send_file(Path("static/models") / filename)
 
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    """Recebe arquivos, inicia pipeline em thread"""
+    global current_stage, cancel_flag, pipeline_thread
 
     uploaded_files = request.files.getlist("file")
     strategy = "sem_fundo"
@@ -24,33 +34,107 @@ def upload():
     original_dir = Path("colmap/images")
     processed_dir = Path("colmap/images_processed")
 
-    # limpa imagens processadas anteriores
     if processed_dir.exists():
         shutil.rmtree(processed_dir)
 
     processed_dir.mkdir(parents=True, exist_ok=True)
     original_dir.mkdir(parents=True, exist_ok=True)
 
-    # aplica o pré-processamento em cada imagem e salva na pasta de entrada do SfM
+    # salva arquivos originais
     for file in uploaded_files:
         if file.filename:
             original_path = original_dir / file.filename
             file.save(original_path)
 
+    # reseta flag de cancelamento
+    cancel_flag = False
+    current_stage = "preprocessamento"
+
+    # inicia pipeline em thread
+    def pipeline():
+        global current_stage, cancel_flag
+
+        # Preprocessamento
+        for file in uploaded_files:
+            if cancel_flag:
+                print("Pipeline cancelado no preprocessamento")
+                current_stage = "idle"
+                return
+
             preprocessing.preprocess_image(
-                input_path=str(original_path),
+                input_path=str(original_dir / file.filename),
                 output_base_dir=str(processed_dir),
                 strategy=strategy
             )
 
-    sfm_input_dir = processed_dir / strategy
+        sfm_input_dir = processed_dir / strategy
 
-    sfm.run_sfm(str(sfm_input_dir))
-    mvs.run_mvs(str(sfm_input_dir))
-    meshing.generate_mesh()
+        # SfM
+        current_stage = "sfm"
+        if cancel_flag:
+            print("Pipeline cancelado antes do SfM")
+            current_stage = "idle"
+            return
+        sfm.run_sfm(str(sfm_input_dir))
 
-    return redirect("/")
+        # MVS
+        current_stage = "mvs"
+        if cancel_flag:
+            print("Pipeline cancelado antes do MVS")
+            current_stage = "idle"
+            return
+        mvs.run_mvs(str(sfm_input_dir))
+
+        # Meshing
+        current_stage = "mesh"
+        if cancel_flag:
+            print("Pipeline cancelado antes da malha")
+            current_stage = "idle"
+            return
+        meshing.generate_mesh()
+
+        current_stage = "done"
+        print("Pipeline finalizado")
+
+    pipeline_thread = threading.Thread(target=pipeline)
+    pipeline_thread.start()
+
+    return {"status": "ok"}
 
 
+@app.route("/cancel", methods=["POST"])
+def cancel():
+    """Aciona cancelamento do pipeline"""
+    global cancel_flag, current_stage
+    cancel_flag = True
+    current_stage = "idle"
+    return jsonify({"status": "cancelled"})
+
+
+@app.route("/status")
+def status():
+    """Retorna a etapa atual do processamento em JSON"""
+    global current_stage
+    return jsonify({"stage": current_stage})
+
+
+@app.route("/download/<format>")
+def download_model(format):
+    if format == "ply":
+        path = Path("static/models/mesh.ply")
+    else:
+        return "Formato não disponível", 404
+
+    return send_file(path, as_attachment=True)
+
+# ===== Função Auxiliar =====
+def reset_pipeline():
+    """Função para resetar variáveis"""
+    global current_stage, cancel_flag, pipeline_thread
+    cancel_flag = False
+    current_stage = "idle"
+    pipeline_thread = None
+
+# ===== Rodar App =====
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,12 +1,19 @@
 import open3d as o3d
 from pathlib import Path
 import numpy as np
+import trimesh
 
 # gerando a malha com Poisson Surface Reconstruction, usando a nuvem de pontos densa gerada pelo MVS e otimizando a malha resultante (removendo partes ruins e suavizando)
 def generate_mesh():
     COLMAP_PATH = Path("colmap")
     FUSED_PATH = COLMAP_PATH / "dense" / "fused.ply"
-    OUTPUT_PATH = Path("static") / "models" / "mesh.ply"
+    
+    MODEL_PATH = Path("static") / "models"
+
+    PLY_PATH = MODEL_PATH / "mesh.ply"
+    OBJ_PATH = MODEL_PATH / "mesh.obj"
+    STL_PATH = MODEL_PATH / "mesh.stl"
+    GLB_PATH = MODEL_PATH / "mesh.glb"
 
     if not FUSED_PATH.exists():
         raise RuntimeError("fused.ply não encontrado! Rode o MVS primeiro.")
@@ -61,10 +68,22 @@ def generate_mesh():
     valid = np.isfinite(vertices).all(axis=1)
     mesh.remove_vertices_by_mask(~valid)
 
-    # salvando a malha gerada (modelo 3D otimizado)
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    o3d.io.write_triangle_mesh(OUTPUT_PATH, mesh)
+    # criar pasta models
+    MODEL_PATH.mkdir(parents=True, exist_ok=True)
 
-    print("Mesh gerada e otimizada com sucesso!")
+    # salvar PLY
+    o3d.io.write_triangle_mesh(PLY_PATH, mesh)
+
+    # salvar OBJ e STL
+    o3d.io.write_triangle_mesh(OBJ_PATH, mesh)
+    o3d.io.write_triangle_mesh(STL_PATH, mesh)
+
+    # converter para GLB usando trimesh
+    tri_mesh = trimesh.load(PLY_PATH)
+    tri_mesh.export(GLB_PATH)
+
+    print("Mesh gerada com sucesso!")
+    print("Formatos disponíveis:")
+    print("PLY, OBJ, STL, GLB")
 
 # generate_mesh() # teste local

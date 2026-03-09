@@ -20,9 +20,12 @@
   --upload-text-shadow: #12121280;
   --generate-button-disabled-color: #888888;
   --generate-button-color: #34cb79;
-  --generate-button-hover-color: #34ae68;
   --success-color: #24ff53;
   --fail-color: #ff3434;
+  --progress-bg: #f0f0f0;
+  --progress-color: var(--generate-button-color);
+  --progress-color-transparent: rgba(52,203,121,0);
+  --cancel-btn-bg: var(--upload-aviso-color);
 }
 
 /*estilos globais*/
@@ -34,7 +37,7 @@ body {
 
 /*início da estilização*/
 body {
-  min-height: 100vh; /*garante que o corpo ocupe toda a altura da viewport*/
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--main-background-color);
@@ -61,7 +64,7 @@ p {
   font-size: 16px;
 }
 
-nav ul { 
+nav ul {
   display: flex;
   gap: 24px;
   list-style: none;
@@ -84,6 +87,7 @@ main {
   flex-direction: column;
   margin: 32px;
   flex: 1;
+  justify-content: center;
 }
 
 main h1 {
@@ -101,7 +105,7 @@ main h1 {
   margin: 60px 0 30px;
 }
 
-#generate .upload-card + span {
+#generate .upload-card+span {
   color: var(--upload-aviso-color);
   font-weight: bold;
   margin-left: -350px;
@@ -117,20 +121,20 @@ main h1 {
   padding: 25px;
 }
 
-#generate .upload-card .file-input > * {
+#generate .upload-card .file-input>* {
   grid-area: stack;
 }
 
-#generate .upload-card .file-input > input {
+#generate .upload-card .file-input>input {
   opacity: 0;
 }
 
-#generate .upload-card .file-input > .drop-zone {
+#generate .upload-card .file-input>.drop-zone {
   border: dashed 2px var(--upload-drop-border);
   border-radius: 10px;
 }
 
-#generate .upload-card .file-input.active > .drop-zone {
+#generate .upload-card .file-input.active>.drop-zone {
   background-color: var(--upload-drop-hover-bg);
 }
 
@@ -161,7 +165,7 @@ main h1 {
   font-size: 12px;
   font-weight: 100;
   white-space: pre;
-  line-height: 2; 
+  line-height: 2;
 }
 
 #generate .upload-card .drop-zone #cover {
@@ -187,8 +191,10 @@ main h1 {
 }
 
 /* ===== Botão Gerar ===== */
-#generate .button-enabled, .button-disabled {
+#generate .button-enabled,
+.button-disabled {
   border: none;
+  width: 203px;
   color: var(--text-color);
   background-color: var(--generate-button-color);
   padding: 18px 36px;
@@ -207,16 +213,100 @@ main h1 {
 }
 
 #generate .button-enabled:hover {
-  background-color: var(--generate-button-hover-color);
+  opacity: 90%;
   cursor: pointer;
+}
+
+.clear-all-btn:hover {
+  opacity: 90%;
+}
+
+/* ===== Progresso da reconstrução ===== */
+#progress-section {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#progress-section h2 {
+  color: var(--text-color);
+  font-size: 32px;
+  text-align: center;
+}
+
+#progress-section .viewer-container {
+  display: flex;
+  align-items: center;
+  margin: 60px 0 0;
+}
+
+#progress-viewer {
+  width: 800px;
+  height: 450px;
+  background-color: var(--upload-card-bg);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-color);
+  text-align: center;
+  padding: 20px;
+  margin: 60px 0 30px;
+}
+
+#progress-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-color);
+  text-align: center;
+}
+
+#progress-bar-container {
+  width: 80%;
+  height: 20px;
+  background-color: var(--progress-bg);
+  border-radius: 10px;
+  margin-top: 30px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    var(--progress-color) 50%,
+    var(--progress-color-transparent) 100%
+  );
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+#cancel-btn {
+  width: 203px;
+  margin-top: 20px;
+  padding: 18px 36px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 15px;
+  border: none;
+  background-color: var(--cancel-btn-bg);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+#cancel-btn:hover {
+  opacity: 90%;
 }
 
 /* ===== Canva 3D ===== */
 #viewer-section {
   width: 100%;
   margin-top: 64px;
-
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
 }
@@ -238,9 +328,50 @@ main h1 {
   height: 534.4px;
   margin-top: 16px;
   margin-bottom: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+}
+
+.download-menu {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.download-menu img {
+  height: 32px;
+  width: auto;
+  cursor: pointer;
+}
+
+#download-btn {
+  width: 32px;
+  cursor: pointer;
+  display: block;
+}
+
+.download-options {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  background: #3c3c3c;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.download-options button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.download-options button:hover {
+  background: #555;
 }
 
 #viewer-canvas {
