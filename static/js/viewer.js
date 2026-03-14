@@ -20,11 +20,12 @@ window.addEventListener("DOMContentLoaded", () => {
   THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
   // configuração da câmera em perspectiva responsável por definir o campo de visão e a posição inicial do observador
+  const container = canvas.parentElement;
   const camera = new THREE.PerspectiveCamera(
     60,
-    canvas.clientWidth / canvas.clientHeight,
+    container.clientWidth / container.clientHeight,
     0.1,
-    10000,
+    10000
   );
   camera.position.set(0, 0, 10);
 
@@ -33,7 +34,7 @@ window.addEventListener("DOMContentLoaded", () => {
     antialias: true,
     canvas: canvas,
   });
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  renderer.setSize(container.clientWidth, container.clientHeight);
 
   // controles interativos de navegação (OrbitControls) permite rotacionar, dar zoom e mover a câmera com o mouse
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -115,8 +116,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // ajuste automático ao redimensionar a janela mantém a proporção correta da câmera e do canvas
   window.addEventListener("resize", () => {
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    const container = canvas.parentElement;
+
+    camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+    renderer.setSize(container.clientWidth, container.clientHeight);
   });
 });

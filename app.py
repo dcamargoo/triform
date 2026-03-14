@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, send_file, jsonify
-from reconstruction import sfm, mvs, meshing, preprocessing
+from reconstruction import preprocessing, sfm, mvs, meshing, export
 from pathlib import Path
 import shutil
 import threading
@@ -93,6 +93,13 @@ def upload():
             return
         meshing.generate_mesh()
 
+        # Exportar formatos
+        if cancel_flag:
+            print("Pipeline cancelado antes da exportação")
+            current_stage = "idle"
+            return
+        export.export_mesh()
+
         current_stage = "done"
         print("Pipeline finalizado")
 
@@ -120,10 +127,21 @@ def status():
 
 @app.route("/download/<format>")
 def download_model(format):
-    if format == "ply":
-        path = Path("static/models/mesh.ply")
-    else:
+
+    formats = {
+        "ply": "mesh.ply",
+        "obj": "mesh.obj",
+        "stl": "mesh.stl",
+        "glb": "mesh.glb"
+    }
+
+    if format not in formats:
         return "Formato não disponível", 404
+
+    path = Path("static/models") / formats[format]
+
+    if not path.exists():
+        return "Arquivo ainda não gerado", 404
 
     return send_file(path, as_attachment=True)
 

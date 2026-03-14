@@ -295,9 +295,15 @@ document.querySelector("input[type='submit']").addEventListener("click", async (
 
   await Promise.all(promises);
 
-  setTimeout(async () => {
+setTimeout(async () => {
+
     document.querySelector("#generate").style.display = "none";
+
     document.querySelector("#progress-section").style.display = "flex";
+
+    setTimeout(() => {
+      window.dispatchEvent(new Event("resize"));
+    }, 100);
 
     startProgressMonitoring();
 
@@ -306,6 +312,7 @@ document.querySelector("input[type='submit']").addEventListener("click", async (
     } catch (e) {
       console.log("Erro na reconstrução:", e);
     }
+
   }, 500);
 });
 
@@ -337,11 +344,21 @@ downloadBtn.addEventListener("click", () => {
 
 document.querySelectorAll(".download-options button").forEach((btn) => {
   btn.addEventListener("click", () => {
+
     const format = btn.dataset.format;
-    if (format === "ply") {
-      window.location.href = "/static/models/mesh.ply";
+
+    const formats = {
+      ply: "/static/models/mesh.ply",
+      obj: "/static/models/mesh.obj",
+      stl: "/static/models/mesh.stl",
+      glb: "/static/models/mesh.glb"
+    };
+
+    if (formats[format]) {
+      window.location.href = formats[format];
     } else {
-      alert("Esse formato ainda não está disponível.");
+      alert("Formato não disponível.");
     }
+
   });
 });
