@@ -10,9 +10,9 @@ def generate_mesh():
 
     print("\n[Meshing]\n")
 
-    COLMAP_PATH = Path("../colmap")
+    COLMAP_PATH = Path("colmap")
     FUSED_PATH = COLMAP_PATH / "dense" / "fused.ply"
-    OUTPUT_PATH = Path("../static") / "models" / "mesh.ply"
+    OUTPUT_PATH = Path("static") / "models" / "mesh.ply"
 
     if not FUSED_PATH.exists():
         raise RuntimeError("fused.ply não encontrado! Rode o MVS primeiro.")
@@ -25,7 +25,7 @@ def generate_mesh():
     diag = np.linalg.norm(bbox.get_extent())
 
     # downsample da nuvem
-    if pointsAmount > 1000000:
+    if pointsAmount > 1200000:
         voxel_size = diag * 0.00015
         pointCloud = pointCloud.voxel_down_sample(voxel_size)
 

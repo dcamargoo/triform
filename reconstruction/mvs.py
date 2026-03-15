@@ -33,9 +33,9 @@ def run_mvs(image_dir=None):
     # configurações do PatchMatch Stereo
     options = pycolmap.PatchMatchOptions()
     options.max_image_size = 1600       
-    options.num_iterations = 7           
-    options.num_samples = 15            
-    options.window_radius = 7            
+    options.num_iterations = 5        
+    options.num_samples = 10          
+    options.window_radius = 5            
     options.filter = True                
     
     # execução do PatchMatch Stereo para gerar a nuvem de pontos densa

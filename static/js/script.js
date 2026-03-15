@@ -1,9 +1,8 @@
-// ===== Configuração inicial e captura de elementos DOM =====
-const dropzone = document.querySelector("#drop-zone");          // área de drag & drop
-const label = document.querySelector("label.file-input");       // label do input de arquivo
-const input = document.querySelector("input[type='file']");     // input de seleção de arquivos
-const cancelBtn = document.getElementById("cancel-btn");        // botão de cancelar upload
-const downloadBtn = document.getElementById("download-btn");    // botão de download
+const dropzone = document.querySelector("#drop-zone"); // área de drag & drop
+const label = document.querySelector("label.file-input"); // label do input de arquivo
+const input = document.querySelector("input[type='file']"); // input de seleção de arquivos
+const cancelBtn = document.getElementById("cancel-btn"); // botão de cancelar upload
+const downloadBtn = document.getElementById("download-btn"); // botão de download
 const downloadOptions = document.getElementById("download-options"); // opções de download
 
 // conjunto para evitar imagens duplicadas
@@ -12,8 +11,7 @@ const addedImages = new Set();
 // limite máximo de imagens permitidas para o SfM
 const maxImages = 100;
 
-// ===== Funções auxiliares =====
-// Ativa ou desativa o botão "GERAR" dependendo da presença de imagens
+// ativa ou desativa o botão "GERAR" dependendo da presença de imagens
 function updateButtonState() {
   const boxZone = document.querySelector(".box-zone");
   const button = document.querySelector("input[type='submit']");
@@ -32,8 +30,8 @@ function updateButtonState() {
   }
 }
 
-// Atualiza o texto do progresso com base no estágio atual
-function setStageLabel(stage){
+// atualiza o texto do progresso com base no estágio atual
+function setStageLabel(stage) {
   const label = document.getElementById("progress-text");
   const bar = document.getElementById("progress-bar");
 
@@ -41,9 +39,9 @@ function setStageLabel(stage){
     idle: "Aguardando envio...",
     preprocessamento: "Pré-processamento",
     sfm: "Executando SfM",
-    mvs: "Gerando nuvem densa (MVS)",
-    mesh: "Gerando malha 3D",
-    done: "Modelo pronto"
+    mvs: "Executando MVS",
+    mesh: "Gerando a malha",
+    done: "Modelo pronto",
   };
 
   label.innerText = stages[stage] || stage;
@@ -53,7 +51,7 @@ function setStageLabel(stage){
   bar.style.width = percent + "%";
 }
 
-// Converte estágio em percentual de progresso
+// converte estágio em percentual de progresso
 function getProgressPercentage(stage) {
   const stages = {
     idle: 0,
@@ -61,12 +59,12 @@ function getProgressPercentage(stage) {
     sfm: 30,
     mvs: 70,
     mesh: 90,
-    done: 100
+    done: 100,
   };
   return stages[stage] || 0;
 }
 
-// Mostra mensagem de erro para o usuário
+// mostra mensagem de erro para o usuário
 function showMessage(text) {
   let msg = document.querySelector(".msg-erro");
   const form = document.querySelector("#generate form .file-input");
@@ -83,7 +81,7 @@ function showMessage(text) {
   msg.textContent = text;
 }
 
-// Cria botão "REMOVER TUDO" caso não exista
+// cria botão "REMOVER TUDO" caso não exista
 function createClearButton() {
   if (document.querySelector(".clear-all-btn")) return;
 
@@ -116,7 +114,7 @@ function createClearButton() {
   form.appendChild(btn);
 }
 
-// Marca um passo como concluído (visual)
+// marca um passo como concluído (visual)
 function completeStep(stepName) {
   const el = document.getElementById("step-" + stepName);
   if (el) {
@@ -125,9 +123,13 @@ function completeStep(stepName) {
   }
 }
 
-// ===== Eventos de drag & drop =====
-function onEnter() { label.classList.add("active"); }
-function onLeave() { label.classList.remove("active"); }
+// drag and drop
+function onEnter() {
+  label.classList.add("active");
+}
+function onLeave() {
+  label.classList.remove("active");
+}
 
 label.addEventListener("dragenter", onEnter);
 label.addEventListener("dragleave", onLeave);
@@ -159,7 +161,7 @@ label.addEventListener("drop", (e) => {
   input.dispatchEvent(new Event("change"));
 });
 
-// ===== Clique na área de upload cria container para miniaturas =====
+// clique na área de drop para criar a box de miniaturas
 dropzone.addEventListener("click", () => {
   if (!document.querySelector(".box-zone")) {
     const boxZone = document.createElement("div");
@@ -174,7 +176,7 @@ dropzone.addEventListener("click", () => {
   }
 });
 
-// ===== Processamento de imagens selecionadas =====
+// processamento das imagens selecionadas
 input.addEventListener("change", () => {
   const files = Array.from(input.files);
   const boxZone = document.querySelector(".box-zone");
@@ -246,7 +248,7 @@ input.addEventListener("change", () => {
   updateButtonState();
 });
 
-// ===== Cancelamento do upload / processamento =====
+// cancelamento do processo de reconstrução
 cancelBtn.addEventListener("click", async () => {
   try {
     await fetch("/cancel", { method: "POST" });
@@ -276,47 +278,50 @@ cancelBtn.addEventListener("click", async () => {
   createClearButton();
 });
 
-// ===== Envio das imagens para o backend Flask =====
-document.querySelector("input[type='submit']").addEventListener("click", async (e) => {
-  e.preventDefault();
+// envio de imagens para o backend
+document
+  .querySelector("input[type='submit']")
+  .addEventListener("click", async (e) => {
+    e.preventDefault();
 
-  const boxZone = document.querySelector(".box-zone");
-  if (!boxZone) return;
+    const boxZone = document.querySelector(".box-zone");
+    if (!boxZone) return;
 
-  const wrappers = boxZone.querySelectorAll("div");
-  const formData = new FormData();
+    const wrappers = boxZone.querySelectorAll("div");
+    const formData = new FormData();
 
-  const promises = Array.from(wrappers).map(async (wrapper, i) => {
-    const img = wrapper.querySelector("img");
-    const res = await fetch(img.src);
-    const blob = await res.blob();
-    formData.append("file", new File([blob], `image${i}.png`, { type: blob.type }));
+    const promises = Array.from(wrappers).map(async (wrapper, i) => {
+      const img = wrapper.querySelector("img");
+      const res = await fetch(img.src);
+      const blob = await res.blob();
+      formData.append(
+        "file",
+        new File([blob], `image${i}.png`, { type: blob.type }),
+      );
+    });
+
+    await Promise.all(promises);
+
+    setTimeout(async () => {
+      document.querySelector("#generate").style.display = "none";
+
+      document.querySelector("#progress-section").style.display = "flex";
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 100);
+
+      startProgressMonitoring();
+
+      try {
+        await fetch("/upload", { method: "POST", body: formData });
+      } catch (e) {
+        console.log("Erro na reconstrução:", e);
+      }
+    }, 500);
   });
 
-  await Promise.all(promises);
-
-setTimeout(async () => {
-
-    document.querySelector("#generate").style.display = "none";
-
-    document.querySelector("#progress-section").style.display = "flex";
-
-    setTimeout(() => {
-      window.dispatchEvent(new Event("resize"));
-    }, 100);
-
-    startProgressMonitoring();
-
-    try {
-      await fetch("/upload", { method: "POST", body: formData });
-    } catch (e) {
-      console.log("Erro na reconstrução:", e);
-    }
-
-  }, 500);
-});
-
-// ===== Monitoramento do progresso =====
+// progresso
 let progressInterval;
 
 async function checkProgress() {
@@ -327,9 +332,13 @@ async function checkProgress() {
   setStageLabel(stage);
 
   if (stage === "done") {
-    document.querySelector("#progress-section").style.display = "flex";
-    document.querySelector("#viewer-section").style.display = "flex";
     clearInterval(progressInterval);
+
+    document.querySelector("#progress-section").style.display = "none";
+    document.querySelector("#viewer-section").style.display = "flex";
+
+    // dispara evento para carregar o viewer 3D
+    window.dispatchEvent(new Event("mesh-ready"));
   }
 }
 
@@ -337,21 +346,21 @@ function startProgressMonitoring() {
   progressInterval = setInterval(checkProgress, 2000);
 }
 
-// ===== Download do modelo gerado =====
+// download
 downloadBtn.addEventListener("click", () => {
-  downloadOptions.style.display = downloadOptions.style.display === "flex" ? "none" : "flex";
+  downloadOptions.style.display =
+    downloadOptions.style.display === "flex" ? "none" : "flex";
 });
 
 document.querySelectorAll(".download-options button").forEach((btn) => {
   btn.addEventListener("click", () => {
-
     const format = btn.dataset.format;
 
     const formats = {
       ply: "/static/models/mesh.ply",
       obj: "/static/models/mesh.obj",
       stl: "/static/models/mesh.stl",
-      glb: "/static/models/mesh.glb"
+      glb: "/static/models/mesh.glb",
     };
 
     if (formats[format]) {
@@ -359,6 +368,5 @@ document.querySelectorAll(".download-options button").forEach((btn) => {
     } else {
       alert("Formato não disponível.");
     }
-
   });
 });

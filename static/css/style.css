@@ -24,7 +24,7 @@
   --fail-color: #ff3434;
   --progress-bg: #f0f0f0;
   --progress-color: var(--generate-button-color);
-  --progress-color-transparent: rgba(52,203,121,0);
+  --progress-color-transparent: rgba(52, 203, 121, 0);
   --cancel-btn-bg: var(--upload-aviso-color);
 }
 
@@ -105,7 +105,7 @@ main h1 {
   margin: 60px 0 30px;
 }
 
-#generate .upload-card+span {
+#generate .upload-card + span {
   color: var(--upload-aviso-color);
   font-weight: bold;
   margin-left: -350px;
@@ -121,20 +121,20 @@ main h1 {
   padding: 25px;
 }
 
-#generate .upload-card .file-input>* {
+#generate .upload-card .file-input > * {
   grid-area: stack;
 }
 
-#generate .upload-card .file-input>input {
+#generate .upload-card .file-input > input {
   opacity: 0;
 }
 
-#generate .upload-card .file-input>.drop-zone {
+#generate .upload-card .file-input > .drop-zone {
   border: dashed 2px var(--upload-drop-border);
   border-radius: 10px;
 }
 
-#generate .upload-card .file-input.active>.drop-zone {
+#generate .upload-card .file-input.active > .drop-zone {
   background-color: var(--upload-drop-hover-bg);
 }
 
@@ -332,10 +332,18 @@ main h1 {
   position: relative;
 }
 
+#viewer-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 15px;
+  background-color: var(--model-result-bg);
+}
+
 .download-menu {
   position: absolute;
   top: 15px;
-  right: 15px;
+  right: 30px;
 }
 
 .download-menu img {
@@ -373,14 +381,6 @@ main h1 {
 
 .download-options button:hover {
   background: #555;
-}
-
-#viewer-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border-radius: 15px;
-  background-color: var(--model-result-bg);
 }
 
 /* ===== Rodapé ===== */

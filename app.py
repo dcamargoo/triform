@@ -3,7 +3,6 @@ from reconstruction import preprocessing, sfm, mvs, meshing, export
 from pathlib import Path
 import shutil
 import threading
-import time
 
 app = Flask(__name__)
 
@@ -12,7 +11,7 @@ current_stage = "idle"
 cancel_flag = False
 pipeline_thread = None
 
-# ===== Rotas =====
+# rotas do Flask
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -29,7 +28,7 @@ def upload():
     global current_stage, cancel_flag, pipeline_thread
 
     uploaded_files = request.files.getlist("file")
-    strategy = "sem_fundo"
+    strategy = "com_fundo"
 
     original_dir = Path("colmap/images")
     processed_dir = Path("colmap/images_processed")
@@ -54,7 +53,7 @@ def upload():
     def pipeline():
         global current_stage, cancel_flag
 
-        # Preprocessamento
+        # pré-processamento
         for file in uploaded_files:
             if cancel_flag:
                 print("Pipeline cancelado no preprocessamento")
@@ -85,7 +84,7 @@ def upload():
             return
         mvs.run_mvs(str(sfm_input_dir))
 
-        # Meshing
+        # meshing
         current_stage = "mesh"
         if cancel_flag:
             print("Pipeline cancelado antes da malha")
@@ -93,7 +92,7 @@ def upload():
             return
         meshing.generate_mesh()
 
-        # Exportar formatos
+        # exportar formatos
         if cancel_flag:
             print("Pipeline cancelado antes da exportação")
             current_stage = "idle"
@@ -145,7 +144,7 @@ def download_model(format):
 
     return send_file(path, as_attachment=True)
 
-# ===== Função Auxiliar =====
+
 def reset_pipeline():
     """Função para resetar variáveis"""
     global current_stage, cancel_flag, pipeline_thread
@@ -153,6 +152,7 @@ def reset_pipeline():
     current_stage = "idle"
     pipeline_thread = None
 
-# ===== Rodar App =====
+
+# executa app Flask
 if __name__ == "__main__":
     app.run(debug=True)

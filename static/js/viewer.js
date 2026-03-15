@@ -3,8 +3,8 @@ import * as THREE from "three";
 import { PLYLoader } from "https://cdn.jsdelivr.net/npm/three@0.156.0/examples/jsm/loaders/PLYLoader.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.156.0/examples/jsm/controls/OrbitControls.js";
 
-// aguarda o carregamento completo do DOM para garantir que o canvas já existe
-window.addEventListener("DOMContentLoaded", () => {
+// aguarda o carregamento completo do modelo antes de iniciar a configuração da cena e renderização
+window.addEventListener("mesh-ready", () => {
   // captura o elemento canvas onde o modelo será renderizado
   const canvas = document.getElementById("viewer-canvas");
   if (!canvas) {
@@ -25,7 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
     60,
     container.clientWidth / container.clientHeight,
     0.1,
-    10000
+    10000,
   );
   camera.position.set(0, 0, 10);
 

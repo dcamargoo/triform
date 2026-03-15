@@ -10,5 +10,6 @@ pycolmap-cuda12
 opencv-python
 numpy
 Pillow
-rembg
+onnxruntime
+rembg[gpu]
 trimesh
