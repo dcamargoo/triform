@@ -24,7 +24,7 @@ def serve_models(filename):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    """Recebe arquivos, inicia pipeline em thread"""
+    # recebe as imagens e inicia pipeline de reconstrução
     global current_stage, cancel_flag, pipeline_thread
 
     uploaded_files = request.files.getlist("file")
@@ -110,7 +110,7 @@ def upload():
 
 @app.route("/cancel", methods=["POST"])
 def cancel():
-    """Aciona cancelamento do pipeline"""
+    # cancelamento do pipeline
     global cancel_flag, current_stage
     cancel_flag = True
     current_stage = "idle"
@@ -119,7 +119,7 @@ def cancel():
 
 @app.route("/status")
 def status():
-    """Retorna a etapa atual do processamento em JSON"""
+    # retorna a etapa atual do processamento em JSON
     global current_stage
     return jsonify({"stage": current_stage})
 
@@ -127,6 +127,7 @@ def status():
 @app.route("/download/<format>")
 def download_model(format):
 
+    # exportação de formatos
     formats = {
         "ply": "mesh.ply",
         "obj": "mesh.obj",
@@ -146,7 +147,7 @@ def download_model(format):
 
 
 def reset_pipeline():
-    """Função para resetar variáveis"""
+    # função para resetar estado do pipeline (usada em testes)
     global current_stage, cancel_flag, pipeline_thread
     cancel_flag = False
     current_stage = "idle"

@@ -2,6 +2,7 @@ import open3d as o3d
 import trimesh
 from pathlib import Path
 
+# função principal para exportar a malha para outros formatos (chamada no arquivo com Flask)
 def export_mesh():
 
     MODEL_PATH = Path("static") / "models"
@@ -29,5 +30,9 @@ def export_mesh():
     tri_mesh = trimesh.load(PLY_PATH)
     tri_mesh.export(GLB_PATH)
 
+    print()
+    print("*"*50)
     print("Conversão concluída!")
     print("Formatos disponíveis: OBJ, STL, GLB")
+    print("*"*50)
+    print()
