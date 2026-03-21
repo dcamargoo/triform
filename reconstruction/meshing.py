@@ -24,7 +24,7 @@ def generate_mesh():
     bbox = pointCloud.get_axis_aligned_bounding_box()
     diag = np.linalg.norm(bbox.get_extent())
 
-    maxPoints = 1000000
+    maxPoints = 1005000
     downsampledPointsAmount = pointsAmount
 
     # downsample da nuvem se necessário
@@ -74,8 +74,7 @@ def generate_mesh():
         pointCloud,
         depth=10,
         scale=1.1,
-        linear_fit=True,
-        n_threads=-1
+        linear_fit=True
     )
 
     # organiza as densidades para remover outliers da malha
@@ -145,7 +144,7 @@ def generate_mesh():
     print("Triângulos:", trianglesAmount)
     print("Pontos 3D (MVS):", pointsAmount)
     print("Pontos 3D (Downsample):", downsampledPointsAmount)
-    print("Tempo gasto (Meshing):", f"{difTime:.2f}", "segundos")
+    print("Tempo gasto (Meshing):", f"{difTime/60:.2f}", "minutos")
     print("Mesh gerada e otimizada com sucesso!")
     print("*"*50)
     print()

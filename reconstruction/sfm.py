@@ -51,7 +51,7 @@ def run_sfm(image_dir=None):
 
     print("Imagens reconstruídas:", largest_rec.num_images())
     print("Pontos 3D (SfM):", largest_rec.num_points3D())
-    print("Tempo gasto (SfM):", f"{difTime:.2f}", "segundos")
+    print("Tempo gasto (SfM):", f"{difTime/60:.2f}", "minutos")
     print("SfM finalizado com sucesso!")
     print("*"*50)
     print()

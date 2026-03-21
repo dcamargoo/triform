@@ -46,7 +46,7 @@ def run_mvs(image_dir=None):
 
     # configurações da Stereo Fusion
     fusion_options = pycolmap.StereoFusionOptions()
-    fusion_options.min_num_pixels = 4
+    fusion_options.min_num_pixels = 3
     fusion_options.max_reproj_error = 1
     fusion_options.max_depth_error = 0.01
 
@@ -69,7 +69,7 @@ def run_mvs(image_dir=None):
     print()
     print("*"*50)
     print(f"Pontos 3D (MVS): {densePointsAmount}")
-    print(f"Tempo gasto (MVS): {difTime:.2f} segundos")
+    print(f"Tempo gasto (MVS): {difTime/60:.2f} minutos")
     print("MVS finalizado com sucesso!")
     print("*"*50)
     print()
