@@ -154,7 +154,7 @@ def generate_mesh():
 def get_best_voxel_size(pointCloud, diag, maxPoints):
 
     initialVoxelSize = diag * 0.00005
-    increaser = 1.1
+    increaser = 1.05
     
     voxelSize = initialVoxelSize
     testPointCloud = pointCloud.voxel_down_sample(voxelSize)
