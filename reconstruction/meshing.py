@@ -29,6 +29,7 @@ def generate_mesh():
 
     # downsample da nuvem se necessário
     if pointsAmount > maxPoints:
+        print("\nCalculando o melhor voxel para Downsampling...\n")
         bestVoxelSize = get_best_voxel_size(pointCloud, diag, maxPoints)
         pointCloud = pointCloud.voxel_down_sample(bestVoxelSize)
         downsampledPointsAmount = len(pointCloud.points)
