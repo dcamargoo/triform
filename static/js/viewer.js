@@ -5,6 +5,20 @@ import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.156.0/exampl
 
 // aguarda o carregamento completo do modelo antes de iniciar a configuração da cena e renderização
 window.addEventListener("mesh-ready", () => {
+  const closeBtn = document.getElementById("close-btn");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      document.getElementById("viewer-section").style.display = "none";
+      document.getElementById("generate").style.display = "block";
+      document.getElementById("progress-section").style.display = "none";
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 100);
+    });
+  }
+
   // captura o elemento canvas onde o modelo será renderizado
   const canvas = document.getElementById("viewer-canvas");
   if (!canvas) {

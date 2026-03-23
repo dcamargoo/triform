@@ -1,20 +1,45 @@
-const dropzone = document.querySelector("#drop-zone"); // área de drag & drop
-const label = document.querySelector("label.file-input"); // label do input de arquivo
-const input = document.querySelector("input[type='file']"); // input de seleção de arquivos
-const cancelBtn = document.getElementById("cancel-btn"); // botão de cancelar upload
-const downloadBtn = document.getElementById("download-btn"); // botão de download
-const downloadOptions = document.getElementById("download-options"); // opções de download
+// ===== ELEMENTOS =====
+const dropzone = document.querySelector("#drop-zone");
+const label = document.querySelector("label.file-input");
+const input = document.querySelector("input[type='file']");
+const cancelBtn = document.getElementById("cancel-btn");
+const downloadBtn = document.getElementById("download-btn");
+const downloadOptions = document.getElementById("download-options");
 
-// conjunto para evitar imagens duplicadas
+// ===== ESTADO =====
 const addedImages = new Set();
-
-// limite máximo de imagens permitidas para o SfM
 const maxImages = 100;
+let progressInterval;
 
-// ativa ou desativa o botão "GERAR" dependendo da presença de imagens
+// ===== UTIL =====
+// Retorna ou cria a área de preview das imagens
+function getOrCreateBoxZone() {
+  let boxZone = document.querySelector(".box-zone");
+
+  if (!boxZone) {
+    boxZone = document.createElement("div");
+    boxZone.classList.add("box-zone");
+
+    Object.assign(boxZone.style, {
+      marginTop: "10px",
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      gap: "20px",
+    });
+
+    dropzone.insertAdjacentElement("afterend", boxZone);
+  }
+
+  return boxZone;
+}
+
+// Atualiza estado do botão "GERAR"
 function updateButtonState() {
   const boxZone = document.querySelector(".box-zone");
   const button = document.querySelector("input[type='submit']");
+  const clearBtn = document.querySelector(".clear-all-btn");
+
   if (!button) return;
 
   const hasImages = boxZone && boxZone.querySelectorAll("img").length > 0;
@@ -23,51 +48,23 @@ function updateButtonState() {
     button.classList.add("button-enabled");
     button.classList.remove("button-disabled");
     button.disabled = false;
+
+    createClearButton();
+    if (clearBtn) clearBtn.style.display = "block";
   } else {
     button.classList.add("button-disabled");
     button.classList.remove("button-enabled");
     button.disabled = true;
+
+    if (clearBtn) clearBtn.style.display = "none";
   }
 }
 
-// atualiza o texto do progresso com base no estágio atual
-function setStageLabel(stage) {
-  const label = document.getElementById("progress-text");
-  const bar = document.getElementById("progress-bar");
-
-  const stages = {
-    idle: "Aguardando envio...",
-    preprocessamento: "Pré-processamento",
-    sfm: "Executando SfM",
-    mvs: "Executando MVS",
-    mesh: "Gerando a malha",
-    done: "Modelo pronto",
-  };
-
-  label.innerText = stages[stage] || stage;
-
-  // atualiza a barra de progresso
-  const percent = getProgressPercentage(stage);
-  bar.style.width = percent + "%";
-}
-
-// converte estágio em percentual de progresso
-function getProgressPercentage(stage) {
-  const stages = {
-    idle: 0,
-    preprocessamento: 10,
-    sfm: 30,
-    mvs: 70,
-    mesh: 90,
-    done: 100,
-  };
-  return stages[stage] || 0;
-}
-
-// mostra mensagem de erro para o usuário
+// Exibe mensagem de erro (evita duplicação de elementos)
 function showMessage(text) {
   let msg = document.querySelector(".msg-erro");
   const form = document.querySelector("#generate form .file-input");
+
   if (!form) return;
 
   if (!msg) {
@@ -81,7 +78,8 @@ function showMessage(text) {
   msg.textContent = text;
 }
 
-// cria botão "REMOVER TUDO" caso não exista
+// ===== UPLOAD =====
+// Cria botão "REMOVER TUDO"
 function createClearButton() {
   if (document.querySelector(".clear-all-btn")) return;
 
@@ -89,98 +87,92 @@ function createClearButton() {
   btn.innerText = "REMOVER TUDO";
   btn.classList.add("clear-all-btn");
 
-  btn.style.display = "block";
-  btn.style.fontSize = "16px";
-  btn.style.fontWeight = "bold";
-  btn.style.margin = "20px auto";
-  btn.style.padding = "18px 36px";
-  btn.style.borderRadius = "15px";
-  btn.style.border = "none";
-  btn.style.background = "#ff3434";
-  btn.style.color = "white";
-  btn.style.cursor = "pointer";
+  Object.assign(btn.style, {
+    display: "block",
+    width: "190px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    margin: "20px auto",
+    padding: "14px 28px",
+    borderRadius: "15px",
+    border: "none",
+    background: "#ff3434",
+    color: "white",
+    cursor: "pointer",
+  });
 
   btn.addEventListener("click", (e) => {
     e.preventDefault();
+
     const boxZone = document.querySelector(".box-zone");
     if (boxZone) boxZone.innerHTML = "";
 
     addedImages.clear();
     updateButtonState();
-    btn.remove(); // remove o botão do DOM
+    btn.remove();
   });
 
-  const form = document.querySelector("#generate form");
-  form.appendChild(btn);
+  document.querySelector("#generate form").appendChild(btn);
 }
 
-// marca um passo como concluído (visual)
-function completeStep(stepName) {
-  const el = document.getElementById("step-" + stepName);
-  if (el) {
-    el.classList.remove("active");
-    el.classList.add("done");
-  }
+// Cria preview da imagem com botão de remoção
+function createImagePreview(file, fileID) {
+  const boxZone = getOrCreateBoxZone();
+
+  const wrapper = document.createElement("div");
+  Object.assign(wrapper.style, {
+    position: "relative",
+    width: "96px",
+    height: "96px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  });
+
+  const img = document.createElement("img");
+  img.src = URL.createObjectURL(file);
+  Object.assign(img.style, {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    borderRadius: "15px",
+  });
+
+  const removeBtn = document.createElement("button");
+  removeBtn.innerText = "✕";
+
+  Object.assign(removeBtn.style, {
+    position: "absolute",
+    top: "5px",
+    right: "5px",
+    width: "20px",
+    height: "20px",
+    borderRadius: "15px",
+    background: "#2B2B2B",
+    color: "#D7D7D7",
+    cursor: "pointer",
+  });
+
+  removeBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    wrapper.remove();
+    addedImages.delete(fileID);
+    updateButtonState();
+  });
+
+  wrapper.appendChild(img);
+  wrapper.appendChild(removeBtn);
+  boxZone.appendChild(wrapper);
 }
 
-// drag and drop
-function onEnter() {
-  label.classList.add("active");
-}
-function onLeave() {
-  label.classList.remove("active");
-}
-
-label.addEventListener("dragenter", onEnter);
-label.addEventListener("dragleave", onLeave);
-label.addEventListener("dragend", onLeave);
-
-label.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  label.classList.add("active");
-});
-
-label.addEventListener("drop", (e) => {
-  e.preventDefault();
-  onLeave();
-
-  const files = Array.from(e.dataTransfer.files);
-
-  if (!document.querySelector(".box-zone")) {
-    const boxZone = document.createElement("div");
-    boxZone.classList.add("box-zone");
-    boxZone.style.marginTop = "10px";
-    boxZone.style.display = "flex";
-    boxZone.style.flexWrap = "wrap";
-    boxZone.style.justifyContent = "center";
-    boxZone.style.gap = "20px";
-    dropzone.insertAdjacentElement("afterend", boxZone);
-  }
-
-  input.files = e.dataTransfer.files;
-  input.dispatchEvent(new Event("change"));
-});
-
-// clique na área de drop para criar a box de miniaturas
-dropzone.addEventListener("click", () => {
-  if (!document.querySelector(".box-zone")) {
-    const boxZone = document.createElement("div");
-    boxZone.classList.add("box-zone");
-    boxZone.style.marginTop = "10px";
-    boxZone.style.display = "flex";
-    boxZone.style.flexWrap = "wrap";
-    boxZone.style.justifyContent = "center";
-    boxZone.style.gap = "20px";
-    boxZone.style.gridArea = "auto";
-    dropzone.insertAdjacentElement("afterend", boxZone);
-  }
-});
-
-// processamento das imagens selecionadas
+// Processa arquivos selecionados:
+// - valida formato
+// - evita duplicados
+// - limita quantidade
+// - cria previews
 input.addEventListener("change", () => {
   const files = Array.from(input.files);
-  const boxZone = document.querySelector(".box-zone");
-  if (!boxZone) return;
+  const boxZone = getOrCreateBoxZone();
 
   const currentImages = boxZone.querySelectorAll("img").length;
   const spacesLeft = maxImages - currentImages;
@@ -199,56 +191,122 @@ input.addEventListener("change", () => {
     if (!validFormats.includes(file.type)) return;
 
     addedImages.add(fileID);
-
-    // wrapper da miniatura
-    const wrapper = document.createElement("div");
-    wrapper.style.position = "relative";
-    wrapper.style.width = "128px";
-    wrapper.style.height = "128px";
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "center";
-    wrapper.style.justifyContent = "center";
-
-    // miniatura
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "15px";
-
-    // botão de remover
-    const removeBtn = document.createElement("button");
-    removeBtn.innerText = "X";
-    removeBtn.style.position = "absolute";
-    removeBtn.style.top = "5px";
-    removeBtn.style.right = "5px";
-    removeBtn.style.width = "25px";
-    removeBtn.style.height = "25px";
-    removeBtn.style.borderRadius = "15px";
-    removeBtn.style.background = "#2B2B2B";
-    removeBtn.style.color = "#D7D7D7";
-    removeBtn.style.cursor = "pointer";
-
-    removeBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      wrapper.remove();
-      addedImages.delete(fileID);
-      updateButtonState();
-    });
-
-    wrapper.appendChild(img);
-    wrapper.appendChild(removeBtn);
-    boxZone.appendChild(wrapper);
-
-    createClearButton();
+    createImagePreview(file, fileID);
   });
 
   input.value = "";
+  createClearButton();
   updateButtonState();
 });
 
-// cancelamento do processo de reconstrução
+// ===== DRAG & DROP =====
+function onEnter() {
+  label.classList.add("active");
+}
+
+function onLeave() {
+  label.classList.remove("active");
+}
+
+label.addEventListener("dragenter", onEnter);
+label.addEventListener("dragleave", onLeave);
+label.addEventListener("dragend", onLeave);
+
+label.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  label.classList.add("active");
+});
+
+label.addEventListener("drop", (e) => {
+  e.preventDefault();
+  onLeave();
+
+  getOrCreateBoxZone();
+
+  input.files = e.dataTransfer.files;
+
+  // força disparo do evento change manualmente
+  input.dispatchEvent(new Event("change"));
+});
+
+dropzone.addEventListener("click", () => {
+  let boxZone = document.querySelector(".box-zone");
+
+  if (!boxZone) {
+    // cria container de pré-visualização
+    boxZone = document.createElement("div");
+    boxZone.classList.add("box-zone");
+
+    // mantém o mesmo estilo que antes
+    Object.assign(boxZone.style, {
+      marginTop: "10px",
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      gap: "20px",
+      width: "100%",
+      gridArea: "auto",
+    });
+
+    // insere logo após o dropzone para aparecer abaixo
+    dropzone.parentNode.insertBefore(boxZone, dropzone.nextSibling);
+  }
+});
+
+// ===== PROGRESSO =====
+// Converte estágio em percentual
+function getProgressPercentage(stage) {
+  const stages = {
+    idle: 0,
+    preprocessamento: 10,
+    sfm: 30,
+    mvs: 70,
+    mesh: 90,
+    done: 100,
+  };
+  return stages[stage] || 0;
+}
+
+// Atualiza UI de progresso
+function setStageLabel(stage) {
+  const label = document.getElementById("progress-text");
+  const bar = document.getElementById("progress-bar");
+
+  const stages = {
+    idle: "Aguardando envio...",
+    preprocessamento: "Pré-processamento",
+    sfm: "Executando SfM",
+    mvs: "Executando MVS",
+    mesh: "Gerando a malha",
+    done: "Modelo pronto",
+  };
+
+  label.innerText = stages[stage] || stage;
+  bar.style.width = getProgressPercentage(stage) + "%";
+}
+
+// Consulta backend e atualiza status
+async function checkProgress() {
+  const res = await fetch("/status");
+  const data = await res.json();
+
+  setStageLabel(data.stage);
+
+  if (data.stage === "done") {
+    clearInterval(progressInterval);
+
+    document.querySelector("#progress-section").style.display = "none";
+    document.querySelector("#viewer-section").style.display = "flex";
+
+    window.dispatchEvent(new Event("mesh-ready"));
+  }
+}
+
+function startProgressMonitoring() {
+  progressInterval = setInterval(checkProgress, 2000);
+}
+
+// ===== CANCELAMENTO =====
 cancelBtn.addEventListener("click", async () => {
   try {
     await fetch("/cancel", { method: "POST" });
@@ -261,24 +319,20 @@ cancelBtn.addEventListener("click", async () => {
   document.getElementById("progress-bar").style.width = "0%";
   document.getElementById("progress-text").innerText = "Cancelado";
 
-  document.getElementById("progress-section").style.display = "none";
-  document.getElementById("generate").style.display = "inline";
+  setTimeout(() => {
+    document.getElementById("progress-section").style.display = "none";
+    document.getElementById("generate").style.display = "inline";
 
-  const boxZone = document.querySelector(".box-zone");
-  if (boxZone) boxZone.innerHTML = "";
+    const boxZone = document.querySelector(".box-zone");
+    if (boxZone) boxZone.innerHTML = "";
 
-  const clearBtn = document.querySelector(".clear-all-btn");
-  if (clearBtn) {
-    clearBtn.style.display = "none";
-  }
-
-  addedImages.clear();
-  updateButtonState();
-
-  createClearButton();
+    addedImages.clear();
+    updateButtonState();
+  }, 3000);
 });
 
-// envio de imagens para o backend
+// ===== ENVIO =====
+// Converte imagens preview em arquivos e envia pro backend
 document
   .querySelector("input[type='submit']")
   .addEventListener("click", async (e) => {
@@ -294,9 +348,10 @@ document
       const img = wrapper.querySelector("img");
       const res = await fetch(img.src);
       const blob = await res.blob();
+
       formData.append(
         "file",
-        new File([blob], `image${i}.png`, { type: blob.type }),
+        new File([blob], `image${i}.png`, { type: blob.type })
       );
     });
 
@@ -304,12 +359,9 @@ document
 
     setTimeout(async () => {
       document.querySelector("#generate").style.display = "none";
-
       document.querySelector("#progress-section").style.display = "flex";
 
-      setTimeout(() => {
-        window.dispatchEvent(new Event("resize"));
-      }, 100);
+      window.dispatchEvent(new Event("resize"));
 
       startProgressMonitoring();
 
@@ -321,32 +373,7 @@ document
     }, 500);
   });
 
-// progresso
-let progressInterval;
-
-async function checkProgress() {
-  const res = await fetch("/status");
-  const data = await res.json();
-  const stage = data.stage;
-
-  setStageLabel(stage);
-
-  if (stage === "done") {
-    clearInterval(progressInterval);
-
-    document.querySelector("#progress-section").style.display = "none";
-    document.querySelector("#viewer-section").style.display = "flex";
-
-    // dispara evento para carregar o viewer 3D
-    window.dispatchEvent(new Event("mesh-ready"));
-  }
-}
-
-function startProgressMonitoring() {
-  progressInterval = setInterval(checkProgress, 2000);
-}
-
-// download
+// ===== DOWNLOAD =====
 downloadBtn.addEventListener("click", () => {
   downloadOptions.style.display =
     downloadOptions.style.display === "flex" ? "none" : "flex";

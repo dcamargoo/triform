@@ -1,4 +1,4 @@
-/*CSS reset*/
+/* ===== RESET ===== */
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +6,7 @@
   font-family: "Roboto", sans-serif;
 }
 
-/*variáveis de cores*/
+/* ===== VARIÁVEIS ===== */
 :root {
   --main-background-color: #2b2b2b;
   --header-footer-color: #454545;
@@ -16,104 +16,104 @@
   --upload-card-bg: #3c3c3c;
   --upload-drop-border: #d7d7d7;
   --upload-drop-hover-bg: #d6d6d640;
-  --model-result-bg: #3c3c3c;
   --upload-text-shadow: #12121280;
-  --generate-button-disabled-color: #888888;
   --generate-button-color: #34cb79;
+  --generate-button-disabled-color: #888888;
+  --cancel-btn-bg: #ff3434;
   --success-color: #24ff53;
   --fail-color: #ff3434;
   --progress-bg: #f0f0f0;
   --progress-color: var(--generate-button-color);
   --progress-color-transparent: rgba(52, 203, 121, 0);
-  --cancel-btn-bg: var(--upload-aviso-color);
+  --model-result-bg: #3c3c3c;
+  --border-default: #444;
+  --text-secondary: #bcbcbc;
+  --badge-bg: #ff8c00;
+  --button-close-bg: #ff0000;
+  --download-hover-bg: #555;
 }
 
-/*estilos globais*/
+/* ===== LAYOUT GLOBAL ===== */
 html,
 body {
   background-color: var(--main-background-color);
   height: 100%;
 }
 
-/*início da estilização*/
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--main-background-color);
-}
-
-/* ===== Cabeçalho ===== */
-header {
-  background-color: var(--header-footer-color);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 64px;
-}
-
-header img {
-  height: 120px;
-  width: auto;
-  display: block;
 }
 
 p {
   color: var(--text-color);
-  font-size: 16px;
-}
-
-nav ul {
-  display: flex;
-  gap: 24px;
-  list-style: none;
-}
-
-nav a:hover {
-  color: var(--link-hover-color);
-  text-decoration: solid;
+  font-size: 12px;
 }
 
 a {
   color: var(--text-color);
-  font-size: 22px;
+  font-size: 16px;
   text-decoration: none;
 }
 
-/* ===== Conteúdo Principal ===== */
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 64px;
+}
+
+header img {
+  height: 48px;
+  width: auto;
+  display: block;
+}
+
+/* ===== MAIN ===== */
 main {
   display: flex;
   flex-direction: column;
-  margin: 32px;
+  margin: 16px;
+  padding: 0 10px;
   flex: 1;
   justify-content: center;
 }
 
 main h1 {
   color: var(--text-color);
-  font-size: 32px;
+  font-size: 24px;
   text-align: center;
 }
 
-/* ===== Área de Upload ===== */
+/* ===== UPLOAD ===== */
+
+/* Container principal do upload */
 #generate .upload-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  margin: 60px 0 30px;
+  margin: 30px 0 15px;
 }
 
+/* Aviso exibido via JS (mantido mesmo não aparecendo no HTML fixo) */
 #generate .upload-card + span {
   color: var(--upload-aviso-color);
   font-weight: bold;
   margin-left: -350px;
 }
 
+/* 
+  Input invisível sobreposto ao drop-zone.
+  Grid usado para empilhar elementos (input + área clicável).
+*/
 #generate .upload-card .file-input {
-  width: 800px;
-  height: auto !important;
+  width: 100%;
+  max-width: 600px;
+  height: auto !important; /* sobrescreve possíveis estilos inline */
   background-color: var(--upload-card-bg);
   display: grid;
   grid-template-areas: "stack";
@@ -129,17 +129,20 @@ main h1 {
   opacity: 0;
 }
 
+/* Borda da área de drop */
 #generate .upload-card .file-input > .drop-zone {
   border: dashed 2px var(--upload-drop-border);
   border-radius: 10px;
 }
 
+/* Estado ativo controlado via JS (drag over) */
 #generate .upload-card .file-input.active > .drop-zone {
   background-color: var(--upload-drop-hover-bg);
 }
 
+/* Área de drag & drop */
 #generate .upload-card .drop-zone {
-  height: 400px;
+  height: 300px;
   display: flex;
   flex-wrap: wrap;
   gap: 0 20px;
@@ -168,6 +171,9 @@ main h1 {
   line-height: 2;
 }
 
+/* 
+  Preview de imagem (usado via JS)
+*/
 #generate .upload-card .drop-zone #cover {
   width: 100px;
   height: 100px;
@@ -177,12 +183,14 @@ main h1 {
   object-fit: cover;
 }
 
+/* Hover da área de upload */
 #generate .upload-card .drop-zone:hover {
   opacity: 0.5;
   transition-duration: 250ms;
   cursor: pointer;
 }
 
+/* Botão de remover imagem (controlado via JS) */
 #generate .upload-card .remove-btn {
   width: 32px;
   position: absolute;
@@ -190,16 +198,18 @@ main h1 {
   margin-top: -16px;
 }
 
-/* ===== Botão Gerar ===== */
+/* ===== BOTÃO GERAR ===== */
+
+/* Estado ativo/inativo controlado via JS */
 #generate .button-enabled,
 .button-disabled {
   border: none;
-  width: 203px;
+  width: 100%;
+  max-width: 190px;
   color: var(--text-color);
   background-color: var(--generate-button-color);
-  padding: 18px 36px;
+  padding: 14px 28px;
   text-align: center;
-  text-decoration: none;
   display: block;
   font-size: 16px;
   font-weight: bold;
@@ -217,32 +227,90 @@ main h1 {
   cursor: pointer;
 }
 
+/* Possível botão usado via JS */
 .clear-all-btn:hover {
   opacity: 90%;
 }
 
-/* ===== Progresso da reconstrução ===== */
+/* ===== TUTORIAL ===== */
+#tutorial-section {
+  padding: 32px 0;
+  text-align: center;
+}
+
+#tutorial-section h1 {
+  margin-bottom: 30px;
+}
+
+.tutorial-steps {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.step {
+  background: #2b2b2b;
+  border: 1px solid var(--border-default);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.badge {
+  background: var(--badge-bg);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.step-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.step p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ===== PROGRESSO ===== */
 #progress-section {
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-#progress-section h2 {
-  color: var(--text-color);
-  font-size: 32px;
-  text-align: center;
-}
-
+/* Mantido pois pode ser usado dinamicamente */
 #progress-section .viewer-container {
   display: flex;
   align-items: center;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 16 / 11;
   margin: 60px 0 0;
 }
 
 #progress-viewer {
-  width: 800px;
-  height: 450px;
+  width: 100%;
+  max-width: 600px;
+  height: 300px;
   background-color: var(--upload-card-bg);
   border-radius: 15px;
   display: flex;
@@ -254,22 +322,23 @@ main h1 {
   color: var(--text-color);
   text-align: center;
   padding: 20px;
-  margin: 60px 0 30px;
+  margin: 30px 0 15px;
 }
 
 #progress-text {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: bold;
   color: var(--text-color);
   text-align: center;
 }
 
+/* Barra de progresso animada */
 #progress-bar-container {
   width: 80%;
   height: 20px;
   background-color: var(--progress-bg);
   border-radius: 10px;
-  margin-top: 30px;
+  margin-top: 15px;
   overflow: hidden;
 }
 
@@ -285,10 +354,11 @@ main h1 {
   transition: width 0.5s ease-in-out;
 }
 
+/* Botão cancelar */
 #cancel-btn {
-  width: 203px;
+  width: 190px;
   margin-top: 20px;
-  padding: 18px 36px;
+  padding: 14px 28px;
   font-size: 16px;
   font-weight: bold;
   border-radius: 15px;
@@ -302,34 +372,32 @@ main h1 {
   opacity: 90%;
 }
 
-/* ===== Canva 3D ===== */
+/* ===== VISUALIZADOR 3D ===== */
 #viewer-section {
   width: 100%;
   height: 70vh;
-  margin-top: 64px;
   display: none;
   flex-direction: column;
   align-items: center;
 }
 
-#viewer-section h2,
+/* Status controlado via JS */
 #viewer-section #viewer-status {
   width: 100%;
   text-align: center;
-  color: var(--text-color);
   font-weight: bold;
-}
-
-#viewer-section #viewer-status {
   color: var(--success-color);
 }
 
+/* Container mantém proporção do canvas */
 .viewer-container {
-  width: 800px;
-  height: 534.4px;
+  width: 100%;
+  max-width: 600px;
+  height: 411.4px;
   margin-top: 16px;
   margin-bottom: 16px;
   position: relative;
+  aspect-ratio: 16 / 11;
 }
 
 #viewer-canvas {
@@ -340,6 +408,22 @@ main h1 {
   background-color: var(--model-result-bg);
 }
 
+/* Botão fechar */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  left: 30px;
+  background: var(--button-close-bg);
+  color: white;
+  border: none;
+  font-size: 18px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Menu de download */
 .download-menu {
   position: absolute;
   top: 15px;
@@ -347,17 +431,18 @@ main h1 {
 }
 
 .download-menu img {
-  height: 32px;
+  height: 24px;
   width: auto;
   cursor: pointer;
 }
 
 #download-btn {
-  width: 32px;
+  width: 24px;
   cursor: pointer;
   display: block;
 }
 
+/* Opções aparecem via JS */
 .download-options {
   display: none;
   position: absolute;
@@ -365,7 +450,7 @@ main h1 {
   left: 50%;
   transform: translateX(-50%);
   flex-direction: column;
-  background: #3c3c3c;
+  background: #2b2b2b;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -380,12 +465,47 @@ main h1 {
 }
 
 .download-options button:hover {
-  background: #555;
+  background: var(--download-hover-bg);
 }
 
-/* ===== Rodapé ===== */
+/* ===== FOOTER ===== */
 footer {
   background-color: var(--header-footer-color);
   text-align: center;
-  padding: 28px;
+  padding: 12px 0;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (min-width: 768px) {
+  header {
+    padding: 12px 64px;
+  }
+
+  header img {
+    height: 48px;
+  }
+
+  main h1 {
+    font-size: 24px;
+  }
+
+  #generate .upload-card .drop-zone {
+    height: 300px;
+  }
+
+  .tutorial-steps {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  .viewer-container {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 1024px) {
+  header {
+    margin: auto;
+  }
 }
