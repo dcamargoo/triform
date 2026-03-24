@@ -23,6 +23,39 @@
   <main>
     <section id="generate">
       <h1>Transforme suas imagens em modelos 3D em instantes</h1>
+      <div class="options-container">
+        <div class="option-group">
+          <label for="strategy">Processamento</label>
+          <select name="strategy" id="strategy">
+            <option value="com_fundo">Com fundo</option>
+            <option value="sem_fundo">Sem fundo</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="invertNormals">Normais</label>
+          <select name="invertNormals" id="invertNormals">
+            <option value="normal">Normal</option>
+            <option value="invert">Invertida</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="depth">
+            Nível de qualidade: <strong id="depth-value">10</strong>
+          </label>
+          <input 
+            type="range" 
+            name="depth" 
+            id="depth" 
+            min="7" 
+            max="12" 
+            value="10"
+          />
+          <div class="range-labels">
+            <span>7 (Rápido e baixa qualidade)</span>
+            <span>12 (Lento e alta qualidade)</span>
+          </div>
+        </div>
+      </div>
       <form action="/upload" method="post" enctype="multipart/form-data">
         <div class="upload-card">
           <label for="file" class="file-input">

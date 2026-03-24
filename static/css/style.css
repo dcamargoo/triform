@@ -88,9 +88,60 @@ main h1 {
   text-align: center;
 }
 
-/* ===== UPLOAD ===== */
+/* ===== Filtro ===== */
+.options-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin: 15px auto;
+  flex-wrap: nowrap;
+}
 
-/* Container principal do upload */
+.option-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: auto;
+}
+
+.option-group label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.option-group select {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--main-background-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.option-group input[type="range"] {
+  width: 350px;
+  accent-color: var(--badge-bg);
+  cursor: pointer;
+}
+
+#depth-value {
+  color: var(--badge-bg);
+  font-weight: bold;
+}
+
+.range-labels {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+/* ===== UPLOAD ===== */
 #generate .upload-card {
   display: flex;
   flex-direction: column;
@@ -99,21 +150,16 @@ main h1 {
   margin: 30px 0 15px;
 }
 
-/* Aviso exibido via JS (mantido mesmo não aparecendo no HTML fixo) */
 #generate .upload-card + span {
   color: var(--upload-aviso-color);
   font-weight: bold;
   margin-left: -350px;
 }
 
-/* 
-  Input invisível sobreposto ao drop-zone.
-  Grid usado para empilhar elementos (input + área clicável).
-*/
 #generate .upload-card .file-input {
   width: 100%;
   max-width: 600px;
-  height: auto !important; /* sobrescreve possíveis estilos inline */
+  height: auto !important;
   background-color: var(--upload-card-bg);
   display: grid;
   grid-template-areas: "stack";
@@ -129,18 +175,15 @@ main h1 {
   opacity: 0;
 }
 
-/* Borda da área de drop */
 #generate .upload-card .file-input > .drop-zone {
   border: dashed 2px var(--upload-drop-border);
   border-radius: 10px;
 }
 
-/* Estado ativo controlado via JS (drag over) */
 #generate .upload-card .file-input.active > .drop-zone {
   background-color: var(--upload-drop-hover-bg);
 }
 
-/* Área de drag & drop */
 #generate .upload-card .drop-zone {
   height: 300px;
   display: flex;
@@ -171,9 +214,6 @@ main h1 {
   line-height: 2;
 }
 
-/* 
-  Preview de imagem (usado via JS)
-*/
 #generate .upload-card .drop-zone #cover {
   width: 100px;
   height: 100px;
@@ -183,14 +223,12 @@ main h1 {
   object-fit: cover;
 }
 
-/* Hover da área de upload */
 #generate .upload-card .drop-zone:hover {
   opacity: 0.5;
   transition-duration: 250ms;
   cursor: pointer;
 }
 
-/* Botão de remover imagem (controlado via JS) */
 #generate .upload-card .remove-btn {
   width: 32px;
   position: absolute;
@@ -199,8 +237,6 @@ main h1 {
 }
 
 /* ===== BOTÃO GERAR ===== */
-
-/* Estado ativo/inativo controlado via JS */
 #generate .button-enabled,
 .button-disabled {
   border: none;
@@ -227,7 +263,6 @@ main h1 {
   cursor: pointer;
 }
 
-/* Possível botão usado via JS */
 .clear-all-btn:hover {
   opacity: 90%;
 }
@@ -297,7 +332,6 @@ main h1 {
   flex-direction: column;
 }
 
-/* Mantido pois pode ser usado dinamicamente */
 #progress-section .viewer-container {
   display: flex;
   align-items: center;
@@ -332,7 +366,6 @@ main h1 {
   text-align: center;
 }
 
-/* Barra de progresso animada */
 #progress-bar-container {
   width: 80%;
   height: 20px;
@@ -354,7 +387,6 @@ main h1 {
   transition: width 0.5s ease-in-out;
 }
 
-/* Botão cancelar */
 #cancel-btn {
   width: 190px;
   margin-top: 20px;
@@ -381,7 +413,6 @@ main h1 {
   align-items: center;
 }
 
-/* Status controlado via JS */
 #viewer-section #viewer-status {
   width: 100%;
   text-align: center;
@@ -389,7 +420,6 @@ main h1 {
   color: var(--success-color);
 }
 
-/* Container mantém proporção do canvas */
 .viewer-container {
   width: 100%;
   max-width: 600px;
@@ -408,7 +438,6 @@ main h1 {
   background-color: var(--model-result-bg);
 }
 
-/* Botão fechar */
 .close-btn {
   position: absolute;
   top: 15px;
@@ -423,7 +452,6 @@ main h1 {
   cursor: pointer;
 }
 
-/* Menu de download */
 .download-menu {
   position: absolute;
   top: 15px;
@@ -442,7 +470,6 @@ main h1 {
   display: block;
 }
 
-/* Opções aparecem via JS */
 .download-options {
   display: none;
   position: absolute;
@@ -501,6 +528,10 @@ footer {
 
   .viewer-container {
     aspect-ratio: 1 / 1;
+  }
+
+  .options-container {
+    flex-wrap: wrap;
   }
 }
 

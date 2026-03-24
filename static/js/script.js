@@ -344,6 +344,12 @@ document
     const wrappers = boxZone.querySelectorAll("div");
     const formData = new FormData();
 
+    const depthValue = document.getElementById("depth").value;
+    const strategyValue = document.getElementById("strategy").value;
+
+    formData.append("depth", depthValue);
+    formData.append("strategy", strategyValue);
+
     const promises = Array.from(wrappers).map(async (wrapper, i) => {
       const img = wrapper.querySelector("img");
       const res = await fetch(img.src);
@@ -397,3 +403,12 @@ document.querySelectorAll(".download-options button").forEach((btn) => {
     }
   });
 });
+
+const depthSlider = document.getElementById("depth");
+const depthValue = document.getElementById("depth-value");
+
+if (depthSlider && depthValue) {
+  depthSlider.addEventListener("input", () => {
+    depthValue.innerText = depthSlider.value;
+  });
+}

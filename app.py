@@ -10,6 +10,7 @@ app = Flask(__name__)
 current_stage = "idle"
 cancel_flag = False
 pipeline_thread = None
+VALID_STRATEGIES = {"com_fundo", "sem_fundo"}
 
 # rotas do Flask
 @app.route("/")
@@ -28,7 +29,16 @@ def upload():
     global current_stage, cancel_flag, pipeline_thread
 
     uploaded_files = request.files.getlist("file")
-    strategy = "com_fundo"
+    try:
+        depth = int(request.form.get("depth", 9))
+    except:
+        depth = 9
+
+    depth = max(7, min(12, depth))
+    strategy = request.form.get("strategy", "com_fundo")
+
+    if strategy not in VALID_STRATEGIES:
+        strategy = "com_fundo"
 
     original_dir = Path("colmap/images")
     processed_dir = Path("colmap/images_processed")
@@ -90,7 +100,8 @@ def upload():
             print("Pipeline cancelado antes da malha")
             current_stage = "idle"
             return
-        meshing.generate_mesh()
+        meshing.generate_mesh(depth=depth)
+        print(f"Depth selecionado: {depth}")
 
         # exportar formatos
         if cancel_flag:

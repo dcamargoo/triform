@@ -4,7 +4,7 @@ import numpy as np
 import time
 
 # função principal para gerar a malha a partir da nuvem de pontos densa (chamada no arquivo com Flask)
-def generate_mesh():
+def generate_mesh(depth=10):
 
     startTime = time.time()
 
@@ -73,7 +73,7 @@ def generate_mesh():
     # gera a malha usando Poisson Surface Reconstruction
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         pointCloud,
-        depth=10,
+        depth=depth,
         scale=1.1,
         linear_fit=True
     )
