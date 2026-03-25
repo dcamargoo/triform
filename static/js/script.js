@@ -345,10 +345,15 @@ document
     const formData = new FormData();
 
     const depthValue = document.getElementById("depth").value;
-    const strategyValue = document.getElementById("strategy").value;
+
+    const semFundo = document.getElementById("sem_fundo").checked;
+    const invertNormals = document.getElementById("invertNormals").checked;
+
+    const strategyValue = semFundo ? "sem_fundo" : "com_fundo";
 
     formData.append("depth", depthValue);
     formData.append("strategy", strategyValue);
+    formData.append("invertNormals", invertNormals);
 
     const promises = Array.from(wrappers).map(async (wrapper, i) => {
       const img = wrapper.querySelector("img");

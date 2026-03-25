@@ -40,6 +40,8 @@ def upload():
     if strategy not in VALID_STRATEGIES:
         strategy = "com_fundo"
 
+    invert_normals = request.form.get("invertNormals", "false") == "true"
+
     original_dir = Path("colmap/images")
     processed_dir = Path("colmap/images_processed")
 
@@ -100,7 +102,7 @@ def upload():
             print("Pipeline cancelado antes da malha")
             current_stage = "idle"
             return
-        meshing.generate_mesh(depth=depth)
+        meshing.generate_mesh(depth=depth, invert_normals=invert_normals)
         print(f"Depth selecionado: {depth}")
 
         # exportar formatos

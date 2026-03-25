@@ -24,19 +24,18 @@
     <section id="generate">
       <h1>Transforme suas imagens em modelos 3D em instantes</h1>
       <div class="options-container">
+        
         <div class="option-group">
-          <label for="strategy">Processamento</label>
-          <select name="strategy" id="strategy">
-            <option value="com_fundo">Com fundo</option>
-            <option value="sem_fundo">Sem fundo</option>
-          </select>
+          <label>
+            <input type="checkbox" name="sem_fundo" id="sem_fundo">
+            Remover fundo
+          </label>
         </div>
         <div class="option-group">
-          <label for="invertNormals">Normais</label>
-          <select name="invertNormals" id="invertNormals">
-            <option value="normal">Normal</option>
-            <option value="invert">Invertida</option>
-          </select>
+          <label>
+            <input type="checkbox" name="invertNormals" id="invertNormals">
+            Normais invertidas
+          </label>
         </div>
         <div class="option-group">
           <label for="depth">

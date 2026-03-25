@@ -4,7 +4,7 @@ import numpy as np
 import time
 
 # função principal para gerar a malha a partir da nuvem de pontos densa (chamada no arquivo com Flask)
-def generate_mesh(depth=10):
+def generate_mesh(depth=10, invert_normals=False):
 
     startTime = time.time()
 
@@ -128,12 +128,21 @@ def generate_mesh(depth=10):
     valid = np.isfinite(vertices).all(axis=1)
     mesh.remove_vertices_by_mask(~valid)
 
+    if len(mesh.triangles) == 0:
+        raise RuntimeError("Malha vazia após reconstrução.")
+
+    if invert_normals:
+        print("\nInvertendo normais da malha...\n")
+        triangles = np.asarray(mesh.triangles)
+        mesh.triangles = o3d.utility.Vector3iVector(triangles[:, [0, 2, 1]])
+        mesh.compute_vertex_normals()
+        mesh.compute_triangle_normals()
+
     endTime = time.time()
     difTime = endTime - startTime
 
-    # salva a malha gerada
+    # garante diretório e salva a malha
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-
     o3d.io.write_triangle_mesh(OUTPUT_PATH, mesh)
 
     verticesAmount = len(mesh.vertices)
@@ -165,6 +174,5 @@ def get_best_voxel_size(pointCloud, diag, maxPoints):
         testPointCloud = pointCloud.voxel_down_sample(voxelSize)
 
     return voxelSize
-
 
 #generate_mesh() # teste local
