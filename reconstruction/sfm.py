@@ -4,7 +4,7 @@ import shutil
 import time
 
 # função principal para executar o SfM (chamada no arquivo com Flask)
-def run_sfm(image_dir=None):
+def run_sfm(image_dir=None, cancel_check=None):
 
     startTime = time.time()
 
@@ -14,6 +14,10 @@ def run_sfm(image_dir=None):
     IMAGE_DIR = Path(image_dir) if image_dir else COLMAP_ROOT / "images"
     SPARSE_ROOT = COLMAP_ROOT / "sparse"
     SPARSE_DIR = SPARSE_ROOT / "0"
+
+    # verifica cancelamento antes de começar
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     if not IMAGE_DIR.exists():
         raise RuntimeError(f"Pasta de imagens não encontrada: {IMAGE_DIR}")
@@ -25,16 +29,32 @@ def run_sfm(image_dir=None):
     database = COLMAP_ROOT / "database.db"
     if database.exists():
         database.unlink()
+
+    # verifica cancelamento antes da extração de features
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
     
     # executa o SIFT (detector e descritor de features)
     pycolmap.extract_features(database, IMAGE_DIR)
+
+    # verifica cancelamento antes do matching
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
     
     # executa o matching (encontra correspondências entre as imagens) e executa o RANSAC para filtrar outliers
     pycolmap.match_exhaustive(database)
 
+    # verifica cancelamento antes do incremental mapping
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     # executa a triangulação incremental e o bundle adjustment para criar a reconstrução 3D
     recs = pycolmap.incremental_mapping(database, IMAGE_DIR, SPARSE_DIR)
     recsAmount = len(recs)
+
+    # verifica cancelamento depois do incremental mapping
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     endTime = time.time()
     difTime = endTime - startTime

@@ -10,9 +10,10 @@ app = Flask(__name__)
 current_stage = "idle"
 cancel_flag = False
 pipeline_thread = None
+current_error = ""
 VALID_STRATEGIES = {"com_fundo", "sem_fundo"}
 
-# rotas do Flask
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -25,10 +26,15 @@ def serve_models(filename):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    # recebe as imagens e inicia pipeline de reconstrução
-    global current_stage, cancel_flag, pipeline_thread
+    global current_stage, cancel_flag, pipeline_thread, current_error
 
     uploaded_files = request.files.getlist("file")
+
+    print("uploaded_files:", uploaded_files)
+    print("quantidade:", len(uploaded_files))
+    for i, file in enumerate(uploaded_files):
+        print(f"arquivo {i}: filename={repr(getattr(file, 'filename', None))}")
+
     try:
         depth = int(request.form.get("depth", 9))
     except:
@@ -45,128 +51,123 @@ def upload():
     original_dir = Path("colmap/images")
     processed_dir = Path("colmap/images_processed")
 
+    if original_dir.exists():
+        shutil.rmtree(original_dir)
+
     if processed_dir.exists():
         shutil.rmtree(processed_dir)
 
     processed_dir.mkdir(parents=True, exist_ok=True)
     original_dir.mkdir(parents=True, exist_ok=True)
 
-    # salva arquivos originais
+    valid_files = []
     for file in uploaded_files:
-        if file.filename:
-            original_path = original_dir / file.filename
-            file.save(original_path)
+        filename = getattr(file, "filename", "").strip()
+        if filename:
+            valid_files.append(file)
 
-    # reseta flag de cancelamento
+    if not valid_files:
+        return jsonify({
+            "status": "error",
+            "error": "Nenhuma imagem válida foi enviada."
+        }), 400
+
+    saved_filenames = []
+
+    for file in valid_files:
+        filename = file.filename.strip()
+        original_path = original_dir / filename
+        file.save(original_path)
+        saved_filenames.append(filename)
+
     cancel_flag = False
+    current_error = ""
     current_stage = "preprocessamento"
 
-    # inicia pipeline em thread
     def pipeline():
-        global current_stage, cancel_flag
+        global current_stage, cancel_flag, current_error
 
-        # pré-processamento
-        for file in uploaded_files:
+        try:
+            total = len(saved_filenames)
+
+            for i, filename in enumerate(saved_filenames, start=1):
+                if cancel_flag:
+                    print("Pipeline cancelado no preprocessamento")
+                    current_stage = "idle"
+                    return
+
+                current_stage = f"preprocessamento|{i}|{total}"
+
+                preprocessing.preprocess_image(
+                    input_path=str(original_dir / filename),
+                    output_base_dir=str(processed_dir),
+                    strategy=strategy
+                )
+
+            sfm_input_dir = processed_dir / strategy
+
             if cancel_flag:
-                print("Pipeline cancelado no preprocessamento")
+                print("Pipeline cancelado antes do SfM")
                 current_stage = "idle"
                 return
 
-            preprocessing.preprocess_image(
-                input_path=str(original_dir / file.filename),
-                output_base_dir=str(processed_dir),
-                strategy=strategy
-            )
+            current_stage = "sfm_features"
+            sfm.run_sfm(str(sfm_input_dir))
 
-        sfm_input_dir = processed_dir / strategy
+            if cancel_flag:
+                print("Pipeline cancelado antes do MVS")
+                current_stage = "idle"
+                return
 
-        # SfM
-        current_stage = "sfm"
-        if cancel_flag:
-            print("Pipeline cancelado antes do SfM")
-            current_stage = "idle"
-            return
-        sfm.run_sfm(str(sfm_input_dir))
+            current_stage = "mvs_depth"
+            mvs.run_mvs(str(sfm_input_dir))
 
-        # MVS
-        current_stage = "mvs"
-        if cancel_flag:
-            print("Pipeline cancelado antes do MVS")
-            current_stage = "idle"
-            return
-        mvs.run_mvs(str(sfm_input_dir))
+            if cancel_flag:
+                print("Pipeline cancelado antes da malha")
+                current_stage = "idle"
+                return
 
-        # meshing
-        current_stage = "mesh"
-        if cancel_flag:
-            print("Pipeline cancelado antes da malha")
-            current_stage = "idle"
-            return
-        meshing.generate_mesh(depth=depth, invert_normals=invert_normals)
-        print(f"Depth selecionado: {depth}")
+            current_stage = "mesh_loading"
+            meshing.generate_mesh(depth=depth, invert_normals=invert_normals)
+            print(f"Depth selecionado: {depth}")
 
-        # exportar formatos
-        if cancel_flag:
-            print("Pipeline cancelado antes da exportação")
-            current_stage = "idle"
-            return
-        export.export_mesh()
+            if cancel_flag:
+                print("Pipeline cancelado antes da exportação")
+                current_stage = "idle"
+                return
 
-        current_stage = "done"
-        print("Pipeline finalizado")
+            current_stage = "exporting"
+            export.export_mesh()
 
-    pipeline_thread = threading.Thread(target=pipeline)
+            current_stage = "done"
+            print("Pipeline finalizado")
+
+        except Exception as e:
+            current_error = str(e)
+            current_stage = "error"
+            print("Erro no pipeline:", e)
+
+    pipeline_thread = threading.Thread(target=pipeline, daemon=True)
     pipeline_thread.start()
 
-    return {"status": "ok"}
+    return jsonify({"status": "ok"})
+
+
+@app.route("/status", methods=["GET"])
+def status():
+    global current_stage, current_error
+    return jsonify({
+        "stage": current_stage,
+        "error": current_error
+    })
 
 
 @app.route("/cancel", methods=["POST"])
 def cancel():
-    # cancelamento do pipeline
-    global cancel_flag, current_stage
+    global cancel_flag, current_stage, current_error
+
     cancel_flag = True
     current_stage = "idle"
+    current_error = "cancelled"
+
     return jsonify({"status": "cancelled"})
-
-
-@app.route("/status")
-def status():
-    # retorna a etapa atual do processamento em JSON
-    global current_stage
-    return jsonify({"stage": current_stage})
-
-
-@app.route("/download/<format>")
-def download_model(format):
-
-    # exportação de formatos
-    formats = {
-        "ply": "mesh.ply",
-        "obj": "mesh.obj",
-        "stl": "mesh.stl",
-        "glb": "mesh.glb"
-    }
-
-    if format not in formats:
-        return "Formato não disponível", 404
-
-    path = Path("static/models") / formats[format]
-
-    if not path.exists():
-        return "Arquivo ainda não gerado", 404
-
-    return send_file(path, as_attachment=True)
-
-
-def reset_pipeline():
-    # função para resetar estado do pipeline (usada em testes)
-    global current_stage, cancel_flag, pipeline_thread
-    cancel_flag = False
-    current_stage = "idle"
-    pipeline_thread = None
-
-
-# executa app Flask
-if __name__ == "__main__":
-    app.run(debug=True)

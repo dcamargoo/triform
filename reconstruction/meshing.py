@@ -4,7 +4,7 @@ import numpy as np
 import time
 
 # função principal para gerar a malha a partir da nuvem de pontos densa (chamada no arquivo com Flask)
-def generate_mesh(depth=10, invert_normals=False):
+def generate_mesh(depth=10, invert_normals=False, cancel_check=None):
 
     startTime = time.time()
 
@@ -14,11 +14,19 @@ def generate_mesh(depth=10, invert_normals=False):
     FUSED_PATH = COLMAP_PATH / "dense" / "fused.ply"
     OUTPUT_PATH = Path("static") / "models" / "mesh.ply"
 
+    # verifica cancelamento antes de começar
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     if not FUSED_PATH.exists():
         raise RuntimeError("fused.ply não encontrado! Rode o MVS primeiro.")
 
     pointCloud = o3d.io.read_point_cloud(FUSED_PATH)
     pointsAmount = len(pointCloud.points)
+
+    # verifica cancelamento após carregar nuvem
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     # calcula tamanho da cena com bounding box e diagonal
     bbox = pointCloud.get_axis_aligned_bounding_box()
@@ -30,15 +38,25 @@ def generate_mesh(depth=10, invert_normals=False):
     # downsample da nuvem se necessário
     if pointsAmount > maxPoints:
         print("\nCalculando o melhor voxel para Downsampling...\n")
-        bestVoxelSize = get_best_voxel_size(pointCloud, diag, maxPoints)
+
+        bestVoxelSize = get_best_voxel_size(pointCloud, diag, maxPoints, cancel_check)
+
+        if cancel_check and cancel_check():
+            raise Exception("cancelled")
+
         pointCloud = pointCloud.voxel_down_sample(bestVoxelSize)
         downsampledPointsAmount = len(pointCloud.points)
+
         print(f"\nVoxel size usado: {bestVoxelSize:.8f}")
         print(f"Downsample: {downsampledPointsAmount} pontos 3D\n")
     else:
         print(f"\nSem Downsample: {pointsAmount} pontos 3D\n")
 
     print("\nGerando a malha...\n")
+
+    # verifica cancelamento antes de continuar
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     # recalcula tamanho da cena após downsample
     bbox = pointCloud.get_axis_aligned_bounding_box()
@@ -48,17 +66,23 @@ def generate_mesh(depth=10, invert_normals=False):
     radiusNormals = diag * 0.01
     radiusOutlier = diag * 0.02
 
-    # remove outliers estatísticos e de raio
+    # remove outliers estatísticos
     pointCloud, ind = pointCloud.remove_statistical_outlier(
         nb_neighbors=20,
         std_ratio=2.0
     )
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     # remove outliers de raio
     pointCloud, ind = pointCloud.remove_radius_outlier(
         nb_points=16,
         radius=radiusOutlier
     )
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     # estima normais
     pointCloud.estimate_normals(
@@ -67,6 +91,9 @@ def generate_mesh(depth=10, invert_normals=False):
             max_nn=30
         )
     )
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     pointCloud.orient_normals_consistent_tangent_plane(100)
 
@@ -77,6 +104,9 @@ def generate_mesh(depth=10, invert_normals=False):
         scale=1.1,
         linear_fit=True
     )
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     # organiza as densidades para remover outliers da malha
     densities = np.asarray(densities)
@@ -91,6 +121,9 @@ def generate_mesh(depth=10, invert_normals=False):
     mesh.remove_degenerate_triangles()
     mesh.remove_non_manifold_edges()
 
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     # suavização taubin
     mesh = mesh.filter_smooth_taubin(number_of_iterations=3)
 
@@ -103,12 +136,14 @@ def generate_mesh(depth=10, invert_normals=False):
     mesh.remove_unreferenced_vertices()
     mesh.compute_vertex_normals()
 
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     # mantém apenas o maior cluster de triângulos para garantir uma malha conectada
     triangleClusters, clusterNTriangles, clusterArea = (
         mesh.cluster_connected_triangles()
     )
 
-    # remove clusters menores (deixa somente o principal) 
     triangleClusters = np.asarray(triangleClusters)
     clusterNTriangles = np.asarray(clusterNTriangles)
 
@@ -138,6 +173,9 @@ def generate_mesh(depth=10, invert_normals=False):
         mesh.compute_vertex_normals()
         mesh.compute_triangle_normals()
 
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     endTime = time.time()
     difTime = endTime - startTime
 
@@ -161,16 +199,20 @@ def generate_mesh(depth=10, invert_normals=False):
 
 
 # função para encontrar o melhor voxel a fim de reduzir a quantidade de pontos 3D da nuvem
-def get_best_voxel_size(pointCloud, diag, maxPoints):
+def get_best_voxel_size(pointCloud, diag, maxPoints, cancel_check=None):
 
     initialVoxelSize = diag * 0.00005
     increaser = 1.05
     
     voxelSize = initialVoxelSize
     testPointCloud = pointCloud.voxel_down_sample(voxelSize)
-    
+
     while len(testPointCloud.points) > maxPoints:
-        voxelSize *= increaser 
+
+        if cancel_check and cancel_check():
+            raise Exception("cancelled")
+
+        voxelSize *= increaser
         testPointCloud = pointCloud.voxel_down_sample(voxelSize)
 
     return voxelSize

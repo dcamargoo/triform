@@ -11,7 +11,10 @@ VALID_STRATEGIES = {
 
 
 # função principal de preprocessamento que aplica as transformações e salva a imagem resultante
-def preprocess_image(input_path, output_base_dir, strategy):
+def preprocess_image(input_path, output_base_dir, strategy, cancel_check=None):
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     if strategy not in VALID_STRATEGIES:
         raise ValueError("Estratégia de preprocessamento inválida")
@@ -19,6 +22,9 @@ def preprocess_image(input_path, output_base_dir, strategy):
     image = cv2.imread(input_path)
     if image is None:
         raise ValueError(f"Não foi possível carregar a imagem: {input_path}")
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     base_output_dir = Path(output_base_dir)
     strategy_dir = base_output_dir / strategy
@@ -28,9 +34,24 @@ def preprocess_image(input_path, output_base_dir, strategy):
     png_name = file_stem + ".png"
 
     resized = resize_if_needed(image)
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     white_balanced = apply_white_balance(resized)
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     filtered = apply_bilateral_filter(white_balanced)
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     enhanced = apply_color_clahe(filtered)
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     if strategy == "com_fundo":
 
@@ -42,10 +63,19 @@ def preprocess_image(input_path, output_base_dir, strategy):
         temp_path = strategy_dir / f"{file_stem}_temp.png"
         cv2.imwrite(str(temp_path), enhanced)
 
-        output_path = strategy_dir / f"{file_stem}_sem_fundo.png"
-        remove_background(str(temp_path), str(output_path))
+        if cancel_check and cancel_check():
+            if temp_path.exists():
+                temp_path.unlink()
+            raise Exception("cancelled")
 
-        temp_path.unlink()
+        output_path = strategy_dir / f"{file_stem}_sem_fundo.png"
+        remove_background(str(temp_path), str(output_path), cancel_check=cancel_check)
+
+        if temp_path.exists():
+            temp_path.unlink()
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
 
     print(f"[PREPROCESSAMENTO] {strategy} → {output_path}")
     
@@ -105,7 +135,14 @@ def apply_color_clahe(image):
 
 
 # usar rembg para remover o fundo da imagem
-def remove_background(input_path, output_path):
+def remove_background(input_path, output_path, cancel_check=None):
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     image = Image.open(input_path)
     result = rembg.remove(image)
+
+    if cancel_check and cancel_check():
+        raise Exception("cancelled")
+
     result.save(output_path)
