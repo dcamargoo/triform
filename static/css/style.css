@@ -94,9 +94,15 @@ main h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 25px;
+  gap: 60px;
   margin: 15px auto;
   flex-wrap: wrap;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .option-group {
@@ -186,7 +192,9 @@ main h1 {
 }
 
 #generate .upload-card .drop-zone {
-  height: 300px;
+  min-height: 200px;
+  height: auto;
+  padding: 20px;
   display: flex;
   flex-wrap: wrap;
   gap: 0 20px;
@@ -204,14 +212,16 @@ main h1 {
 
 #generate .upload-card .drop-zone p {
   text-shadow: var(--upload-text-shadow) 1px 0 20px;
-  width: 300px;
+  width: 100%;
+  max-width: 90%;
+  word-break: break-word;
   font-weight: bold;
 }
 
 #generate .upload-card .drop-zone p span {
   font-size: 12px;
   font-weight: 100;
-  white-space: pre;
+  white-space: normal;
   line-height: 2;
 }
 
@@ -613,6 +623,28 @@ footer {
 }
 
 /* ===== RESPONSIVIDADE ===== */
+
+@media (max-width: 578px) {
+  #generate .upload-card .file-input {
+    padding: 15px;
+    width: auto;
+  }
+
+  #generate .upload-card .drop-zone {
+    min-height: 180px;
+    padding: 15px;
+  }
+
+  #generate .upload-card .drop-zone p {
+    font-size: 11px;
+  }
+  
+  .options-container {
+    gap: 7px;
+    flex-direction: column;
+  }
+}
+
 @media (min-width: 768px) {
   header {
     padding: 12px 64px;

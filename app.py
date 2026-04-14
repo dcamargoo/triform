@@ -28,6 +28,8 @@ def serve_models(filename):
 def upload():
     global current_stage, cancel_flag, pipeline_thread, current_error
 
+    use_preprocess = request.form.get("use_preprocess", "true") == "true"
+
     uploaded_files = request.files.getlist("file")
 
     print("uploaded_files:", uploaded_files)
@@ -101,7 +103,8 @@ def upload():
                 preprocessing.preprocess_image(
                     input_path=str(original_dir / filename),
                     output_base_dir=str(processed_dir),
-                    strategy=strategy
+                    strategy=strategy,
+                    use_preprocess=use_preprocess
                 )
 
             sfm_input_dir = processed_dir / strategy

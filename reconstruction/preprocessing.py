@@ -9,9 +9,8 @@ VALID_STRATEGIES = {
     "sem_fundo"
 }
 
-
 # função principal de preprocessamento que aplica as transformações e salva a imagem resultante
-def preprocess_image(input_path, output_base_dir, strategy, cancel_check=None):
+def preprocess_image(input_path, output_base_dir, strategy, use_preprocess=True, cancel_check=None):
 
     if cancel_check and cancel_check():
         raise Exception("cancelled")
@@ -23,15 +22,18 @@ def preprocess_image(input_path, output_base_dir, strategy, cancel_check=None):
     if image is None:
         raise ValueError(f"Não foi possível carregar a imagem: {input_path}")
 
-    if cancel_check and cancel_check():
-        raise Exception("cancelled")
-
     base_output_dir = Path(output_base_dir)
     strategy_dir = base_output_dir / strategy
     strategy_dir.mkdir(parents=True, exist_ok=True)
 
     file_stem = Path(input_path).stem
     png_name = file_stem + ".png"
+
+    if not use_preprocess:
+        output_path = strategy_dir / png_name
+        cv2.imwrite(str(output_path), image)
+        print(f"[PREPROCESSAMENTO OFF] → {output_path}")
+        return
 
     resized = resize_if_needed(image)
 
@@ -54,12 +56,10 @@ def preprocess_image(input_path, output_base_dir, strategy, cancel_check=None):
         raise Exception("cancelled")
 
     if strategy == "com_fundo":
-
         output_path = strategy_dir / png_name
         cv2.imwrite(str(output_path), enhanced)
 
     elif strategy == "sem_fundo":
-
         temp_path = strategy_dir / f"{file_stem}_temp.png"
         cv2.imwrite(str(temp_path), enhanced)
 
@@ -74,12 +74,8 @@ def preprocess_image(input_path, output_base_dir, strategy, cancel_check=None):
         if temp_path.exists():
             temp_path.unlink()
 
-    if cancel_check and cancel_check():
-        raise Exception("cancelled")
-
-    print(f"[PREPROCESSAMENTO] {strategy} → {output_path}")
+    print(f"[PREPROCESSAMENTO ON] {strategy} → {output_path}")
     
-
 # reduzir resolução da imagem se necessário
 def resize_if_needed(image, max_dimension=1600):
     h, w = image.shape[:2]
@@ -99,7 +95,6 @@ def resize_if_needed(image, max_dimension=1600):
 
     return image.copy()
 
-
 # aplicar correção de branco usando o espaço de cor LAB
 def apply_white_balance(image):
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB).astype(np.float32)
@@ -116,11 +111,9 @@ def apply_white_balance(image):
 
     return cv2.cvtColor(corrected, cv2.COLOR_LAB2BGR)
 
-
 # aplicar filtro bilateral para suavizar a imagem sem perder detalhes
 def apply_bilateral_filter(image):
     return cv2.bilateralFilter(image, d=9, sigmaColor=25, sigmaSpace=25)
-
 
 # aplicar CLAHE para melhorar o contraste local da imagem
 def apply_color_clahe(image):
@@ -132,7 +125,6 @@ def apply_color_clahe(image):
 
     merged = cv2.merge((l_enhanced, a, b))
     return cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
-
 
 # usar rembg para remover o fundo da imagem
 def remove_background(input_path, output_path, cancel_check=None):

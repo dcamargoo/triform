@@ -636,10 +636,12 @@ if (form) {
 
     const depthValue = document.getElementById("depth").value;
     const semFundo = document.getElementById("sem_fundo").checked;
+    const usePreprocess = document.getElementById("use_preprocess").checked;
     const strategyValue = semFundo ? "sem_fundo" : "com_fundo";
 
     formData.append("depth", depthValue);
     formData.append("strategy", strategyValue);
+    formData.append("use_preprocess", usePreprocess ? "true" : "false");
 
     selectedFiles.forEach((item, i) => {
       const originalFile = item.file;

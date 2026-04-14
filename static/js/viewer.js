@@ -40,7 +40,20 @@ function initViewer() {
   }
 
   scene = new THREE.Scene();
+
+  const bgCheckbox = document.getElementById("whiteBackground");
+
   scene.background = new THREE.Color(0x111111);
+
+  if (bgCheckbox) {
+    bgCheckbox.checked = false;
+
+    bgCheckbox.addEventListener("change", () => {
+      scene.background = new THREE.Color(
+        bgCheckbox.checked ? 0xffffff : 0x111111
+      );
+    });
+  }
 
   THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
