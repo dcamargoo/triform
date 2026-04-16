@@ -6,27 +6,27 @@ import time
 # função principal para executar o SfM (chamada no arquivo com Flask)
 def run_sfm(image_dir=None, cancel_check=None):
 
-    startTime = time.time()
+    start_time = time.time()
 
     print("\n[SfM]\n")
 
-    COLMAP_ROOT = Path("colmap")
-    IMAGE_DIR = Path(image_dir) if image_dir else COLMAP_ROOT / "images"
-    SPARSE_ROOT = COLMAP_ROOT / "sparse"
-    SPARSE_DIR = SPARSE_ROOT / "0"
+    colmap_root = Path("colmap")
+    image_dir = Path(image_dir) if image_dir else colmap_root / "images"
+    sparse_root = colmap_root / "sparse"
+    sparse_dir = sparse_root / "0"
 
     # verifica cancelamento antes de começar
     if cancel_check and cancel_check():
         raise Exception("cancelled")
 
-    if not IMAGE_DIR.exists():
-        raise RuntimeError(f"Pasta de imagens não encontrada: {IMAGE_DIR}")
+    if not image_dir.exists():
+        raise RuntimeError(f"Pasta de imagens não encontrada: {image_dir}")
 
-    if SPARSE_ROOT.exists():
-        shutil.rmtree(SPARSE_ROOT)
-    SPARSE_DIR.mkdir(parents=True)
+    if sparse_root.exists():
+        shutil.rmtree(sparse_root)
+    sparse_dir.mkdir(parents=True)
 
-    database = COLMAP_ROOT / "database.db"
+    database = colmap_root / "database.db"
     if database.exists():
         database.unlink()
 
@@ -35,7 +35,7 @@ def run_sfm(image_dir=None, cancel_check=None):
         raise Exception("cancelled")
     
     # executa o SIFT (detector e descritor de features)
-    pycolmap.extract_features(database, IMAGE_DIR)
+    pycolmap.extract_features(database, image_dir)
 
     # verifica cancelamento antes do matching
     if cancel_check and cancel_check():
@@ -49,29 +49,29 @@ def run_sfm(image_dir=None, cancel_check=None):
         raise Exception("cancelled")
 
     # executa a triangulação incremental e o bundle adjustment para criar a reconstrução 3D
-    recs = pycolmap.incremental_mapping(database, IMAGE_DIR, SPARSE_DIR)
-    recsAmount = len(recs)
+    recs = pycolmap.incremental_mapping(database, image_dir, sparse_dir)
+    recs_amount = len(recs)
 
     # verifica cancelamento depois do incremental mapping
     if cancel_check and cancel_check():
         raise Exception("cancelled")
 
-    endTime = time.time()
-    difTime = endTime - startTime
+    end_time = time.time()
+    dif_time = end_time - start_time
 
-    if recsAmount == 0:
+    if recs_amount == 0:
         raise RuntimeError("Nenhuma reconstrução válida foi criada!")
     else:
         print()
         print("*"*50)
-        print("Reconstruções válidas:", recsAmount)
+        print("Reconstruções válidas:", recs_amount)
 
     largest_rec = max(recs.values(), key=lambda m: m.num_images())
-    largest_rec.write(SPARSE_DIR)
+    largest_rec.write(sparse_dir)
 
     print("Imagens reconstruídas:", largest_rec.num_images())
     print("Pontos 3D (SfM):", largest_rec.num_points3D())
-    print("Tempo gasto (SfM):", f"{difTime/60:.2f}", "minutos")
+    print("Tempo gasto (SfM):", f"{dif_time/60:.2f}", "minutos")
     print("SfM finalizado com sucesso!")
     print("*"*50)
     print()

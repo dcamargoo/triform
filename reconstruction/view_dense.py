@@ -2,9 +2,9 @@
 
 import open3d as o3d
 
-pointCloud = o3d.io.read_point_cloud("../colmap/dense/fused.ply")
+point_cloud = o3d.io.read_point_cloud("../colmap/dense/fused.ply")
 
-print(pointCloud)
-print("\nPontos 3D:", len(pointCloud.points), "\n")
+print(point_cloud)
+print("\nPontos 3D:", len(point_cloud.points), "\n")
 
-o3d.visualization.draw_geometries([pointCloud])
+o3d.visualization.draw_geometries([point_cloud])

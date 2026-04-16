@@ -7,25 +7,25 @@ import time
 # função principal para executar o MVS (chamada no arquivo com Flask)
 def run_mvs(image_dir=None, cancel_check=None):
 
-    startTime = time.time()
+    start_time = time.time()
 
     print("\n[MVS]\n")
 
-    COLMAP_PATH = Path("colmap")
-    IMAGE_DIR = Path(image_dir) if image_dir else COLMAP_PATH / "images"
-    SPARSE_DIR = COLMAP_PATH / "sparse/0"
-    DENSE_DIR = COLMAP_PATH / "dense"
+    colmap_path = Path("colmap")
+    image_dir = Path(image_dir) if image_dir else colmap_path / "images"
+    sparse_dir = colmap_path / "sparse/0"
+    dense_dir = colmap_path / "dense"
 
     # verifica cancelamento antes de começar
     if cancel_check and cancel_check():
         raise Exception("cancelled")
 
-    if not SPARSE_DIR.exists():
+    if not sparse_dir.exists():
         raise RuntimeError("Modelo SfM não encontrado em 'colmap/sparse/0'")
 
-    if DENSE_DIR.exists():
-        shutil.rmtree(DENSE_DIR)
-    DENSE_DIR.mkdir(parents=True)
+    if dense_dir.exists():
+        shutil.rmtree(dense_dir)
+    dense_dir.mkdir(parents=True)
 
     # verifica cancelamento antes do undistort
     if cancel_check and cancel_check():
@@ -33,9 +33,9 @@ def run_mvs(image_dir=None, cancel_check=None):
 
     # ajuste das imagens (lente)
     pycolmap.undistort_images(
-        output_path=DENSE_DIR,
-        image_path=IMAGE_DIR,
-        input_path=SPARSE_DIR
+        output_path=dense_dir,
+        image_path=image_dir,
+        input_path=sparse_dir
     )
 
     # verifica cancelamento antes do PatchMatch Stereo
@@ -52,7 +52,7 @@ def run_mvs(image_dir=None, cancel_check=None):
 
     # execução do PatchMatch Stereo para gerar a nuvem de pontos densa
     pycolmap.patch_match_stereo(
-        str(DENSE_DIR),
+        str(dense_dir),
         options=options
     )
 
@@ -66,30 +66,31 @@ def run_mvs(image_dir=None, cancel_check=None):
     fusion_options.max_reproj_error = 1
     fusion_options.max_depth_error = 0.01
 
-    FUSED_PATH = DENSE_DIR / "fused.ply"
+    fused_path = dense_dir / "fused.ply"
 
     # execução da Stereo Fusion para gerar a nuvem de pontos densa final (fused.ply)
     pycolmap.stereo_fusion(
-        output_path=str(FUSED_PATH),
-        workspace_path=str(DENSE_DIR),
-        options=fusion_options
+        output_path=str(fused_path),
+        workspace_path=str(dense_dir),
+        options=fusion_options,
+        output_type="PLY"
     )
 
     # verifica cancelamento depois da fusão
     if cancel_check and cancel_check():
         raise Exception("cancelled")
 
-    endTime = time.time()
-    difTime = endTime - startTime
+    end_time = time.time()
+    dif_time = end_time - start_time
 
     # análise da nuvem de pontos densa gerada
-    densePointCloud = o3d.io.read_point_cloud(str(FUSED_PATH))
-    densePointsAmount = len(densePointCloud.points)
+    dense_point_cloud = o3d.io.read_point_cloud(str(fused_path))
+    dense_points_amount = len(dense_point_cloud.points)
 
     print()
     print("*"*50)
-    print(f"Pontos 3D (MVS): {densePointsAmount}")
-    print(f"Tempo gasto (MVS): {difTime/60:.2f} minutos")
+    print(f"Pontos 3D (MVS): {dense_points_amount}")
+    print(f"Tempo gasto (MVS): {dif_time/60:.2f} minutos")
     print("MVS finalizado com sucesso!")
     print("*"*50)
     print()

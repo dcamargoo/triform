@@ -98,15 +98,15 @@ def resize_if_needed(image, max_dimension=1600):
 # aplicar correção de branco usando o espaço de cor LAB
 def apply_white_balance(image):
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB).astype(np.float32)
-    L, A, B = cv2.split(lab)
+    l, a, b = cv2.split(lab)
 
-    avg_a = np.mean(A)
-    avg_b = np.mean(B)
+    avg_a = np.mean(a)
+    avg_b = np.mean(b)
 
-    A = A - (avg_a - 128) * (L / 255.0)
-    B = B - (avg_b - 128) * (L / 255.0)
+    a = a - (avg_a - 128) * (l / 255.0)
+    b = b - (avg_b - 128) * (l / 255.0)
 
-    corrected = cv2.merge((L, A, B))
+    corrected = cv2.merge((l, a, b))
     corrected = np.clip(corrected, 0, 255).astype(np.uint8)
 
     return cv2.cvtColor(corrected, cv2.COLOR_LAB2BGR)

@@ -133,15 +133,15 @@ function openViewerWithLocalModel(file) {
   document.querySelector("#progress-section").style.display = "none";
   document.querySelector("#viewer-section").style.display = "flex";
 
-  setDownloadVisibility(false); 
+  setDownloadVisibility(false);
 
   window.dispatchEvent(
     new CustomEvent("local-model-selected", {
       detail: {
         file: file,
-        extension: getFileExtension(file.name || "")
-      }
-    })
+        extension: getFileExtension(file.name || ""),
+      },
+    }),
   );
 }
 
@@ -259,7 +259,9 @@ input.addEventListener("change", () => {
   const onlyImages = files.every((file) => imageFormats.includes(file.type));
 
   if (!onlyImages) {
-    showMessage("* Selecione imagens JPG, PNG ou WEBP, ou então um único arquivo 3D.");
+    showMessage(
+      "* Selecione imagens JPG, PNG ou WEBP, ou então um único arquivo 3D.",
+    );
     input.value = "";
     return;
   }
@@ -328,10 +330,14 @@ label.addEventListener("drop", (e) => {
     return;
   }
 
-  const onlyImages = droppedFiles.every((file) => imageFormats.includes(file.type));
+  const onlyImages = droppedFiles.every((file) =>
+    imageFormats.includes(file.type),
+  );
 
   if (!onlyImages) {
-    showMessage("* Arraste imagens JPG, PNG ou WEBP, ou então um único arquivo 3D.");
+    showMessage(
+      "* Arraste imagens JPG, PNG ou WEBP, ou então um único arquivo 3D.",
+    );
     return;
   }
 
@@ -424,16 +430,16 @@ function setStageLabel(stageRaw, errorMsg = "") {
     sfm_features: "SfM: extração de features",
     sfm_verify: "SfM: verificação e reconstrução",
     mvs_depth: "MVS: geração de depth maps",
-    mvs_fusion: "MVS: fusão de nuvem",
-    mesh_loading: "Mesh: carregando nuvem",
-    mesh_downsample: "Mesh: downsample",
-    mesh_outliers: "Mesh: remoção de outliers",
-    mesh_normals: "Mesh: estimando normais",
-    mesh_poisson: "Mesh: Poisson reconstruction",
-    mesh_clean: "Mesh: limpeza",
-    mesh_smooth: "Mesh: suavização",
-    mesh_finalize: "Mesh: finalizando",
-    exporting: "Exportando modelo",
+    mvs_fusion: "MVS: fusão da nuvem",
+    mesh_loading: "Meshing: carregando nuvem",
+    mesh_downsample: "Meshing: downsample",
+    mesh_outliers: "Meshing: remoção de outliers",
+    mesh_normals: "Meshing: estimando normais",
+    mesh_poisson: "Meshing: Poisson Reconstruction",
+    mesh_clean: "Meshing: limpeza",
+    mesh_smooth: "Meshing: suavização",
+    mesh_finalize: "Meshing: finalizando",
+    exporting: "Carregando modelo",
   };
 
   const progressMap = {
@@ -545,7 +551,7 @@ async function checkProgress() {
       if (progressSection) progressSection.style.display = "none";
       if (viewerSection) viewerSection.style.display = "flex";
 
-      setDownloadVisibility(true)
+      setDownloadVisibility(true);
 
       window.dispatchEvent(new Event("mesh-ready"));
     }
