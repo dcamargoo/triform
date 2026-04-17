@@ -30,38 +30,37 @@ def preprocess_image(input_path, output_base_dir, strategy, use_preprocess=True,
     png_name = file_stem + ".png"
 
     if not use_preprocess:
-        output_path = strategy_dir / png_name
-        cv2.imwrite(str(output_path), image)
-        print(f"[PREPROCESSAMENTO OFF] → {output_path}")
-        return
+        processed_image = image.copy()
+    else:
+        resized = resize_if_needed(image)
 
-    resized = resize_if_needed(image)
+        if cancel_check and cancel_check():
+            raise Exception("cancelled")
 
-    if cancel_check and cancel_check():
-        raise Exception("cancelled")
+        white_balanced = apply_white_balance(resized)
 
-    white_balanced = apply_white_balance(resized)
+        if cancel_check and cancel_check():
+            raise Exception("cancelled")
 
-    if cancel_check and cancel_check():
-        raise Exception("cancelled")
+        filtered = apply_bilateral_filter(white_balanced)
 
-    filtered = apply_bilateral_filter(white_balanced)
+        if cancel_check and cancel_check():
+            raise Exception("cancelled")
 
-    if cancel_check and cancel_check():
-        raise Exception("cancelled")
+        enhanced = apply_color_clahe(filtered)
 
-    enhanced = apply_color_clahe(filtered)
+        if cancel_check and cancel_check():
+            raise Exception("cancelled")
 
-    if cancel_check and cancel_check():
-        raise Exception("cancelled")
+        processed_image = enhanced
 
     if strategy == "com_fundo":
         output_path = strategy_dir / png_name
-        cv2.imwrite(str(output_path), enhanced)
+        cv2.imwrite(str(output_path), processed_image)
 
     elif strategy == "sem_fundo":
         temp_path = strategy_dir / f"{file_stem}_temp.png"
-        cv2.imwrite(str(temp_path), enhanced)
+        cv2.imwrite(str(temp_path), processed_image)
 
         if cancel_check and cancel_check():
             if temp_path.exists():
@@ -74,7 +73,8 @@ def preprocess_image(input_path, output_base_dir, strategy, use_preprocess=True,
         if temp_path.exists():
             temp_path.unlink()
 
-    print(f"[PREPROCESSAMENTO ON] {strategy} → {output_path}")
+    status = "ON" if use_preprocess else "OFF"
+    print(f"[PREPROCESSAMENTO {status}] {strategy} → {output_path}")
     
 # reduzir resolução da imagem se necessário
 def resize_if_needed(image, max_dimension=1600):
