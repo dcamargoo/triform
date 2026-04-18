@@ -213,14 +213,15 @@ main h1 {
 #generate .upload-card .drop-zone p {
   text-shadow: var(--upload-text-shadow) 1px 0 20px;
   width: 100%;
-  max-width: 90%;
   word-break: break-word;
   font-weight: bold;
 }
 
 #generate .upload-card .drop-zone p span {
+  display: block;
+  margin-top: 5px;
   font-size: 12px;
-  font-weight: 100;
+  font-weight: 150;
   white-space: normal;
   line-height: 2;
 }
@@ -346,6 +347,7 @@ main h1 {
   border-radius: 8px;
   font-size: 12px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .step-header h3 {

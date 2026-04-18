@@ -77,10 +77,6 @@
               />
               <div class="drop-zone" id="drop-zone">
                 <div class="placeholder">
-                  <img
-                    src="{{ url_for('static', filename='images/icon_add_photo.png') }}"
-                    alt=""
-                  />
                   <p>
                     Arraste até 100 imagens aqui
                     <span>ou clique para selecionar - JPG, PNG, WEBP</span>
@@ -104,12 +100,11 @@
             <div class="step">
               <div class="step-header">
                 <span class="badge">Passo 1</span>
-                <h3>Selecione as imagens</h3>
+                <h3>Selecione as imagens ou importe um modelo</h3>
               </div>
               <p>
-                O usuário seleciona uma imagem no formato JPG, PNG ou WEBP.<br />
-                Para melhores os resultados, recomenda-se imagens com contornos
-                nítidos, boa iluminação e sem sobreposição de objetos.
+                Selecione imagens nos formatos JPG, PNG ou WEBP, ou importe um modelo 3D (PLY, OBJ, STL, GLB).<br/>
+                Para melhores resultados, utilize imagens com boa iluminação, contornos nítidos e sem sobreposição de objetos.
               </p>
             </div>
             <div class="step">
@@ -118,11 +113,8 @@
                 <h3>Gere automaticamente o modelo</h3>
               </div>
               <p>
-                Após o envio, o sistema inicia automaticamente o processamento
-                da imagem.<br />
-                Durante essa etapa, é exibido um indicador de progresso,
-                informando que o modelo 3D está sendo gerado a partir da imagem
-                fornecida, sem necessidade de interação adicional do usuário.
+                Após o envio, o sistema inicia automaticamente o processamento.<br/>
+                Um indicador de progresso será exibido enquanto o modelo 3D é gerado, sem necessidade de interação adicional.
               </p>
             </div>
             <div class="step">
@@ -131,11 +123,8 @@
                 <h3>Visualize e baixe o modelo</h3>
               </div>
               <p>
-                Ao final do processamento, o modelo 3D é apresentado na própria
-                interface da aplicação.<br />
-                O usuário pode visualizar o objeto gerado, analisar sua
-                geometria e, em seguida, realizar o download do modelo para
-                reutilização em outros softwares ou aplicações.
+                Ao final do processamento, o modelo 3D é exibido na interface.<br/>
+                Você pode visualizar, analisar a geometria e fazer o download para uso em outros softwares.
               </p>
             </div>
           </div>
