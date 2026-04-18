@@ -122,6 +122,52 @@ main h1 {
   cursor: pointer;
 }
 
+.info-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.info-icon {
+  width: 16px;
+  height: 16px;
+  cursor: help;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+
+  background-color: #222;
+  color: #fff;
+  font-size: 12px;
+  padding: 8px;
+  border-radius: 6px;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #222 transparent transparent transparent;
+}
+
+.info-wrapper:hover .tooltip {
+  opacity: 1;
+}
+
 .option-group input[type="checkbox"] {
   width: 16px;
   height: 16px;

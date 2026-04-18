@@ -30,7 +30,7 @@
     </header>
     <main>
       <section id="generate">
-        <h1>Transforme suas imagens em modelos 3D em instantes</h1>
+        <h1>Crie modelos 3D a partir de imagens com facilidade</h1>
         <div class="options-container">
           <div class="checkbox-group">
             <div class="option-group">
@@ -44,6 +44,16 @@
               <label>
                 <input type="checkbox" id="use_preprocess" checked />
                 Aplicar pré-processamento
+                <div class="info-wrapper">
+                  <img
+                    src="{{ url_for('static', filename='images/icon_information.png') }}"
+                    class="info-icon"
+                    alt="Informação"
+                  />
+                  <div class="tooltip">
+                    Aplica melhorias automáticas na imagem: redimensionamento, balanço de branco, suavização e ajuste de contraste para otimizar a reconstrução 3D.
+                  </div>
+                </div>
               </label>
             </div>
           </div>
