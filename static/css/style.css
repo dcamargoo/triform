@@ -670,7 +670,17 @@ footer {
   opacity: 0.9;
 }
 
+.msg-erro {
+  color: red;
+  margin-left: -300px;
+}
+
 /* ===== RESPONSIVIDADE ===== */
+@media (max-width: 426px) {
+  .msg-erro {
+    margin-left: 0;
+  }
+}
 
 @media (max-width: 578px) {
   #generate .upload-card .file-input {

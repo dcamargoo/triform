@@ -146,9 +146,33 @@ def upload():
             print("Pipeline finalizado")
 
         except Exception as e:
-            current_error = str(e)
-            current_stage = "error"
             print("Erro no pipeline:", e)
+
+            error_messages = {
+                "preprocessamento": "Erro durante o pré-processamento das imagens.",
+                "sfm_features": "Erro durante a extração de características (SfM).",
+                "sfm_verify": "Erro durante a reconstrução da câmera (SfM).",
+                "mvs_depth": "Erro durante a geração dos depth maps (MVS).",
+                "mvs_fusion": "Erro durante a fusão da nuvem de pontos.",
+                "mesh_loading": "Erro ao carregar a nuvem de pontos.",
+                "mesh_downsample": "Erro durante o downsample da malha.",
+                "mesh_outliers": "Erro na remoção de outliers.",
+                "mesh_normals": "Erro ao estimar as normais.",
+                "mesh_poisson": "Erro durante a reconstrução Poisson.",
+                "mesh_clean": "Erro durante a limpeza da malha.",
+                "mesh_smooth": "Erro durante a suavização da malha.",
+                "mesh_finalize": "Erro na finalização da malha.",
+                "exporting": "Erro ao exportar o modelo 3D.",
+            }
+
+            stage_key = current_stage.split("|")[0]
+
+            current_error = error_messages.get(
+                stage_key,
+                "Ocorreu um erro inesperado durante o processamento.",
+            )
+
+            current_stage = "error"
 
     pipeline_thread = threading.Thread(target=pipeline, daemon=True)
     pipeline_thread.start()

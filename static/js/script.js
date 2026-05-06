@@ -113,8 +113,6 @@ function showMessage(text) {
   if (!msg) {
     msg = document.createElement("p");
     msg.classList.add("msg-erro");
-    msg.style.color = "red";
-    msg.style.marginLeft = "-400px";
     formInput.insertAdjacentElement("beforebegin", msg);
   }
 
