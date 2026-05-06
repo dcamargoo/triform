@@ -69,10 +69,16 @@ function getOrCreateBoxZone() {
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
-      gap: "20px",
+      gap: "15px",
+      width: "100%",
+      gridArea: "auto",
     });
 
-    dropzone.insertAdjacentElement("afterend", boxZone);
+    const fileInput = document.querySelector(
+      "#generate .upload-card .file-input",
+    );
+
+    fileInput.appendChild(boxZone);
   }
 
   return boxZone;
@@ -249,7 +255,6 @@ input.addEventListener("change", () => {
 
   if (files.length === 0) return;
 
-  // se vier apenas 1 arquivo 3D, abre direto no visualizador
   if (files.length === 1 && is3DModelFile(files[0])) {
     openViewerWithLocalModel(files[0]);
     input.value = "";
@@ -324,7 +329,6 @@ label.addEventListener("drop", (e) => {
 
   if (droppedFiles.length === 0) return;
 
-  // se arrastou 1 arquivo 3D, abre direto no viewer
   if (droppedFiles.length === 1 && is3DModelFile(droppedFiles[0])) {
     openViewerWithLocalModel(droppedFiles[0]);
     return;
@@ -367,28 +371,6 @@ label.addEventListener("drop", (e) => {
 
   createClearButton();
   updateButtonState();
-});
-
-dropzone.addEventListener("click", () => {
-  let boxZone = document.querySelector(".box-zone");
-
-  if (!boxZone) {
-    boxZone = document.createElement("div");
-    boxZone.classList.add("box-zone");
-
-    Object.assign(boxZone.style, {
-      marginTop: "10px",
-      display: "flex",
-      flexWrap: "wrap",
-      justifyContent: "center",
-      gap: "15px",
-      width: "100%",
-      gridArea: "auto",
-    });
-
-    // insere logo após o dropzone para aparecer abaixo
-    dropzone.parentNode.insertBefore(boxZone, dropzone.nextSibling);
-  }
 });
 
 // ===== PROGRESSO =====
