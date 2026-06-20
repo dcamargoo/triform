@@ -28,7 +28,7 @@ O projeto foi desenvolvido como Trabalho de Conclusão de Curso (TCC) pela Unive
 2. Structure from Motion (SfM) para geração da nuvem de pontos esparsa (PyCOLMAP)  
 3. Multi-View Stereo (MVS) para densificação da nuvem de pontos (PyCOLMAP)  
 4. Reconstrução de malha 3D via Poisson Surface Reconstruction (Open3D)  
-5. Otimização e exportação em múltiplos formatos (PLY, OBJ, STL e GLB) (Open3D)  
+5. Otimização e exportação em múltiplos formatos (PLY, OBJ, STL e GLB) (Open3D)
 
 ---
 
@@ -172,20 +172,10 @@ flask run
 
 ---
 
-## Imagens da Aplicação Web
+## Interface da Aplicação
 
-### 1. Interface Inicial
-
-<img width="1861" height="1047" alt="image" src="https://github.com/user-attachments/assets/0584f051-37d9-413a-a849-3d92ac40125f" />
-
-### 2. Upload das Imagens
-
-<img width="1861" height="1047" alt="image" src="https://github.com/user-attachments/assets/78095fe2-8a91-40ee-930c-a4f70a3f4e8c" />
-
-### 3. Acompanhamento em Tempo Real
-
-<img width="1861" height="1047" alt="image" src="https://github.com/user-attachments/assets/56e68545-2039-4369-b08c-2120b8fd456f" />
-
-### 4. Visualização do Modelo 3D Gerado
-
-<img width="1861" height="1047" alt="image" src="https://github.com/user-attachments/assets/8f7e1ecf-896a-41ea-b89e-6b27e505720b" /> 
+| 1. Interface Inicial | 2. Upload das Imagens |
+|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/0584f051-37d9-413a-a849-3d92ac40125f" width="100%"> | <img src="https://github.com/user-attachments/assets/78095fe2-8a91-40ee-930c-a4f70a3f4e8c" width="100%"> |
+| **3. Acompanhamento em Tempo Real** | **4. Visualização do Modelo 3D Gerado** |
+| <img src="https://github.com/user-attachments/assets/56e68545-2039-4369-b08c-2120b8fd456f" width="100%"> | <img src="https://github.com/user-attachments/assets/8f7e1ecf-896a-41ea-b89e-6b27e505720b" width="100%"> |
